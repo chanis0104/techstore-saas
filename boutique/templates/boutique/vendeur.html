@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="fr" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Espace Vendeur — {{ profil.nom }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
+</head>
+<body class="min-h-full flex flex-col bg-slate-50 text-slate-900 selection:bg-blue-600 selection:text-white">
+
+    <!-- Barre de navigation Vendeur -->
+    <header class="bg-slate-900/95 backdrop-blur-md text-white sticky top-0 z-40 border-b border-slate-800 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-3.5">
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-slate-800 to-slate-700 flex items-center justify-center shadow-lg text-xl font-black">
+                    ⚙️
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-lg sm:text-xl tracking-tight text-white">Espace Vendeur</h1>
+                    <p class="text-xs text-slate-400 font-medium">Gestion & Stock • {{ profil.nom }}</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <a href="{% url 'catalogue' profil.slug %}" target="_blank" class="group inline-flex items-center gap-2 text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl transition-all shadow-md shadow-blue-500/20">
+                    <span>Voir ma boutique 🛍️</span>
+                    <span class="group-hover:translate-x-0.5 transition-transform">↗</span>
+                </a>
+                <a href="{% url 'deconnexion' %}" class="text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-2.5 rounded-xl transition-all">
+                    Déconnexion 🚪
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenu Principal -->
+    <main class="max-w-7xl w-full mx-auto px-4 sm:px-6 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start flex-grow">
+
+        <!-- COLONNE GAUCHE : PARAMÈTRES BOUTIQUE + AJOUT ARTICLE -->
+        <div class="lg:col-span-5 space-y-6">
+            
+            <!-- Section 1 : Paramètres Boutique -->
+            <section class="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
+                <div class="flex items-center gap-3 border-b border-slate-100 pb-3">
+                    <span class="w-8 h-8 rounded-xl bg-slate-100 flex items-center justify-center text-sm">🏪</span>
+                    <h2 class="font-extrabold text-sm sm:text-base text-slate-900">Infos Boutique & WhatsApp</h2>
+                </div>
+                
+                <form method="POST" class="space-y-4">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="maj_profil">
+                    <div>
+                        <label class="block text-[11px] font-extrabold uppercase tracking-wider text-slate-500 mb-1.5">Nom de la boutique</label>
+                        <input type="text" name="nom" value="{{ profil.nom }}" required class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-xs focus:outline-none focus:border-blue-600 focus:bg-white transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-extrabold uppercase tracking-wider text-slate-500 mb-1.5">Numéro WhatsApp (avec indicatif pays)</label>
+                        <input type="text" name="whatsapp" value="{{ profil.whatsapp }}" required class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-xs focus:outline-none focus:border-blue-600 focus:bg-white transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-extrabold uppercase tracking-wider text-slate-500 mb-1.5">Conditions de livraison & horaires</label>
+                        <textarea name="infos_livraison" rows="3" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-xs focus:outline-none focus:border-blue-600 focus:bg-white transition-all">{{ profil.infos_livraison }}</textarea>
+                    </div>
+                    <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs py-3.5 rounded-2xl transition-all shadow-sm cursor-pointer">
+                        Enregistrer les modifications
+                    </button>
+                </form>
+            </section>
+
+            <!-- Section 2 : Ajouter un article -->
+            <section class="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
+                <div class="flex items-center gap-3 border-b border-slate-100 pb-3">
+                    <span class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-sm">📦</span>
+                    <h2 class="font-extrabold text-sm sm:text-base text-slate-900">Ajouter un article au catalogue</h2>
+                </div>
+
+                <form method="POST" enctype="multipart/form-data" class="space-y-4">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="ajouter_produit">
+                    
+                    <div>
+                        <label class="block text-[11px] font-extrabold uppercase tracking-wider text-slate-500 mb-1.5">Nom du modèle *</label>
+                        <input type="text" name="nom" placeholder="Ex: iPhone 13 Pro ou HP EliteBook" required class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-xs focus:outline-none focus:border-blue-600 focus:bg-white transition-all">
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[11px] font-extrabold uppercase tracking-wider text-slate-500 mb-1.5">Catégorie</label>
+                            <select name="categorie" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-xs focus:outline-none focus:border-blue-600 focus:bg-white transition-all cursor-pointer">
+                                <option value="SMARTPHONE">Téléphones & Tablettes</option>
+                                <option value="PC">Ordinateurs & Laptops</option>
+                                <option value="ACCESSOIRE">Accessoires & Chargeurs</option>
+                                <option value="RESEAU">Routeurs & Réseau</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-extrabold uppercase tracking-wider text-slate-500 mb-1.5">Stock initial *</label>
+                            <input type="number" name="stock" value="1" min="0" required class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-xs text-center font-bold focus:outline-none focus:border-blue-600 focus:bg-white transition-all">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-extrabold uppercase tracking-wider text-slate-500 mb-1.5">Prix de vente *</label>
+                        <input type="text" name="prix" placeholder="Ex: 220 000 FCFA" required class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-xs focus:outline-none focus:border-blue-600 focus:bg-white transition-all">
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-extrabold uppercase tracking-wider text-slate-500 mb-1.5">Fiche technique & Description *</label>
+                        <textarea name="caracteristiques" rows="4" placeholder="Ex: 128Go, batterie 88%, garanti 3 mois avec chargeur d'origine." required class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-xs focus:outline-none focus:border-blue-600 focus:bg-white transition-all"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-extrabold uppercase tracking-wider text-slate-500 mb-1.5">Photo du produit (Optionnel)</label>
+                        <input type="file" name="image" accept="image/*" class="w-full text-xs text-slate-500">
+                    </div>
+
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs py-3.5 rounded-2xl transition-all shadow-md shadow-blue-500/20 cursor-pointer">
+                        + Publier dans le catalogue
+                    </button>
+                </form>
+            </section>
+        </div>
+
+        <!-- COLONNE DROITE : RÉSERVATIONS CLIENTS + STOCK EN RAYON -->
+        <div class="lg:col-span-7 space-y-6">
+            
+            <!-- Réservations reçues -->
+            <section class="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <h2 class="font-extrabold text-sm sm:text-base text-slate-900">📋 Réservations Clients ({{ reservations.count }})</h2>
+                </div>
+                {% if reservations %}
+                <div class="space-y-3">
+                    {% for r in reservations %}
+                    <div class="p-4 rounded-2xl border {% if r.traitee %}bg-slate-50 border-slate-200 opacity-60{% else %}bg-emerald-50/50 border-emerald-200{% endif %} flex items-center justify-between gap-3">
+                        <div class="text-xs">
+                            <p class="font-extrabold text-slate-900">#{{ r.id }} • {{ r.produit.nom }} <span class="text-blue-600">({{ r.produit.prix }})</span></p>
+                            <p class="text-slate-500 text-[11px] mt-0.5">Commandé le {{ r.date_reservation|date:"d/m/Y à H:i" }}</p>
+                        </div>
+                        <form method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="marquer_traitee">
+                            <input type="hidden" name="reservation_id" value="{{ r.id }}">
+                            <button type="submit" class="text-[11px] font-extrabold px-3 py-1.5 rounded-xl border transition cursor-pointer {% if r.traitee %}bg-white border-slate-300 text-slate-600{% else %}bg-emerald-600 text-white border-emerald-600{% endif %}">
+                                {% if r.traitee %}Traité ✅{% else %}Marquer traité ⏳{% endif %}
+                            </button>
+                        </form>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-xs text-slate-400 text-center py-4">Aucune réservation pour le moment.</p>
+                {% endif %}
+            </section>
+
+            <!-- Produits en stock -->
+            <section class="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <h2 class="font-extrabold text-sm sm:text-base text-slate-900">📦 Catalogue & Stock ({{ produits.count }})</h2>
+                </div>
+                {% if produits %}
+                <div class="space-y-3">
+                    {% for p in produits %}
+                    <div class="p-4 rounded-2xl border border-slate-200 flex items-center justify-between gap-4">
+                        <div class="flex items-center gap-3">
+                            {% if p.image_base64 %}
+                            <img src="{{ p.image_base64 }}" alt="{{ p.nom }}" class="w-12 h-12 rounded-xl object-cover border border-slate-100">
+                            {% else %}
+                            <div class="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-lg">📱</div>
+                            {% endif %}
+                            <div class="text-xs">
+                                <p class="font-extrabold text-slate-900">{{ p.nom }}</p>
+                                <p class="text-blue-600 font-bold mt-0.5">{{ p.prix }}</p>
+                                <p class="text-slate-400 text-[10px] mt-0.5">Stock : <span class="font-bold text-slate-700">{{ p.stock }}</span></p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center gap-2">
+                            <form method="POST" class="flex items-center gap-1">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="maj_stock">
+                                <input type="hidden" name="produit_id" value="{{ p.id }}">
+                                <input type="number" name="nouveau_stock" value="{{ p.stock }}" min="0" class="w-14 bg-slate-50 border border-slate-200 rounded-xl px-2 py-1.5 text-xs text-center font-bold">
+                                <button type="submit" class="bg-slate-900 hover:bg-slate-800 text-white text-[10px] font-bold px-2.5 py-1.5 rounded-xl cursor-pointer">Mettre à jour</button>
+                            </form>
+
+                            <form method="POST">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="supprimer_produit">
+                                <input type="hidden" name="produit_id" value="{{ p.id }}">
+                                <button type="submit" onclick="return confirm('Confirmer la suppression ?')" class="text-red-500 hover:bg-red-50 p-2 rounded-xl text-xs transition cursor-pointer" title="Supprimer">🗑️</button>
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-xs text-slate-400 text-center py-6">Votre catalogue est vide. Ajoutez votre premier article ci-contre !</p>
+                {% endif %}
+            </section>
+        </div>
+
+    </main>
+</body>
+</html>
