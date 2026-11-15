@@ -20,6 +20,7 @@ def alleger_image_b64(image_file):
     except Exception:
         return ""
 
+
 def accueil(request):
     """Gère l'arrivée sur la racine du site (/) en excluant la boutique admin."""
     if request.user.is_authenticated and not request.user.is_superuser:
@@ -38,6 +39,13 @@ def accueil(request):
         
     # S'il y a plusieurs boutiques marchandes -> Annuaire
     return render(request, "boutique/annuaire_boutiques.html", {"boutiques": boutiques})
+
+
+def annuaire_boutiques(request):
+    """Affiche toujours la liste complète de toutes les boutiques marchandes."""
+    boutiques = ProfilBoutique.objects.exclude(user__is_superuser=True).order_by("-id")
+    return render(request, "boutique/annuaire_boutiques.html", {"boutiques": boutiques})
+
 
 def inscription_vendeur(request):
     """Gère l'inscription d'un nouveau marchand et crée sa boutique associée."""
@@ -194,7 +202,7 @@ def appeler_gemini(instruction, prompt_complet, api_key):
 
 
 def assistant_ia_vue(request):
-    """Endpoint AJAX pour l'assistant IA connecté au stock, avec mémoire, debug et priorité au stock réel."""
+    """Endpoint AJAX pour l'assistant IA connecté au stock, avec mémoire et priorité au stock réel."""
     if request.method != "POST":
         return JsonResponse({"erreur": "Méthode non autorisée"}, status=405)
         
@@ -211,68 +219,39 @@ def assistant_ia_vue(request):
 
     API_KEY = getattr(settings, "GEMINI_API_KEY", "").strip()
     if not API_KEY:
-        return JsonResponse({"reponse": "Clé API Gemini non configurée."})
+        return JsonResponse({"reponse": "Clé API Gemini non configurée dans settings.py."})
 
-    # 1. Si le slug n'est pas dans le JSON, on le récupère automatiquement depuis le HTTP_REFERER
-    if not boutique_slug:
-        referer = request.META.get('HTTP_REFERER', '')
-        match = re.search(r'/b/([^/]+)/', referer)
-        if match:
-            boutique_slug = match.group(1)
+    profil = ProfilBoutique.objects.filter(slug=boutique_slug).first() or ProfilBoutique.objects.first()
+    nom_boutique = profil.nom if profil else "notre boutique"
+    slug_actuel = profil.slug if profil else "default"
 
-    # 2. Recherche robuste de la boutique
-    profil = None
-    if boutique_slug:
-        profil = ProfilBoutique.objects.filter(slug=boutique_slug).first()
-    if not profil:
-        profil = ProfilBoutique.objects.first()
-
-    # 3. Récupération des produits avec affichage de debug dans le terminal
-    infos_produits = "Aucun produit actuellement en stock."
+    liste_produits = ""
     if profil:
-        produits = profil.produits.all()
-        print(f"\n[DEBUG CHAT] Boutique détectée : {profil.nom} (Slug: {profil.slug})")
-        print(f"[DEBUG CHAT] Nombre de produits trouvés : {produits.count()}")
-        if produits.exists():
-            liste = []
-            for p in produits:
-                print(f" -> Produit : {p.nom} | Prix : {p.prix} | Stock : {p.stock}")
-                liste.append(f"- {p.nom} : {p.prix} FCFA (Stock : {p.stock}) | Caractéristiques : {p.caracteristiques}")
-            infos_produits = "\n".join(liste)
-    else:
-        print("\n[DEBUG CHAT] ERREUR : Aucune boutique trouvée en base de données !")
+        produits_dispo = profil.produits.filter(stock__gt=0)
+        if produits_dispo.exists():
+            lignes = [f"- {p.nom} ({p.get_categorie_display()}) : {p.prix} FCFA | {p.caracteristiques}" for p in produits_dispo]
+            liste_produits = "\n".join(lignes)
+        else:
+            liste_produits = "Aucun produit en stock pour le moment."
 
-    # 4. Gestion de la mémoire de conversation
-    if 'chat_history' not in request.session:
-        request.session['chat_history'] = []
-    
-    historique = request.session['chat_history'][-6:]
-    historique_texte = ""
-    for h in historique:
-        role = "Client" if h['role'] == 'user' else "Assistant"
-        historique_texte += f"{role}: {h['content']}\n"
+    cle_session = f"chat_historique_{slug_actuel}"
+    historique = request.session.get(cle_session, [])
+    historique.append(f"Client : {message_client}")
+    historique = historique[-8:]
 
-    # 5. Instructions système prioritaires orientées stock réel
-    nom_boutique_actuelle = profil.nom if profil else "la boutique"
+    prompt_complet = "\n".join(historique)
+
     instructions_systeme = (
-        f"INSTRUCTION CRITIQUE ET PRIORITAIRE : Tu es le vendeur officiel de la boutique '{nom_boutique_actuelle}'. "
-        f"Voici la liste exacte et actuelle des articles EN STOCK dans ta boutique :\n{infos_produits}\n\n"
-        "Règles strictes :\n"
-        "- IGNORE complètement si l'historique de discussion ci-dessous disait le contraire : le stock ci-dessus est la seule et unique vérité.\n"
-        "- Si le client cherche un article présent dans la liste (comme l'iPhone 13), propose-le immédiatement avec son vrai prix.\n"
-        "- Fais des réponses courtes, chaleureuses et naturelles (2 phrases maximum).\n"
-        "- Ne répète JAMAIS 'Bonjour' si la conversation a déjà commencé.\n"
-        "- INTERDICTION absolue d'utiliser des listes numérotées (1, 2, 3). Parle comme un vrai vendeur sur WhatsApp."
+        f"Tu es un conseiller de vente humain, calme et naturel de la boutique '{nom_boutique}'.\n"
+        f"RÈGLES STRICTES :\n"
+        f"- Ne dis JAMAIS 'Bonjour' ou 'Bienvenue' si la conversation a déjà commencé.\n"
+        f"- Fais des réponses courtes et naturelles (2 à 3 phrases maximum), comme sur WhatsApp.\n"
+        f"- Propose UNIQUEMENT les articles en stock ci-dessous :\n\n"
+        f"STOCK RÉEL DISPONIBLE :\n{liste_produits}"
     )
 
-    prompt_complet = f"Historique de la conversation :\n{historique_texte}\nNouveau message du Client: {message_client}\nAssistant:"
-
     succes, resultat = appeler_gemini(instructions_systeme, prompt_complet, API_KEY)
-    
     if succes:
-        request.session['chat_history'].append({"role": "user", "content": message_client})
-        request.session['chat_history'].append({"role": "assistant", "content": resultat})
-        request.session.modified = True
+        historique.append(f"Vendeur : {resultat}")
+        request.session[cle_session] = historique
         return JsonResponse({"reponse": resultat})
-
-    return JsonResponse({"reponse": "Désolé, petit souci de connexion. Tu peux répéter ?"})
