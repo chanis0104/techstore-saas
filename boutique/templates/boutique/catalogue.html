@@ -9,27 +9,27 @@
     <!-- Tailwind CSS CDN -->
     <script src="https://tailwindcss.com"></script>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col" style="background-color: #020617; color: #f8fafc; font-family: sans-serif;">
 
     <!-- En-tête de la Boutique (Fixé en haut de l'écran) -->
-    <header class="bg-slate-900/95 backdrop-blur-md border-b border-slate-800 px-4 py-3 sm:p-6 shadow-md fixed top-0 left-0 right-0 z-40">
-        <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-2 sm:gap-4">
+    <header class="bg-slate-900/95 backdrop-blur-md border-b border-slate-800 px-4 py-3 sm:p-6 shadow-md fixed top-0 left-0 right-0 z-40" style="background: rgba(15, 23, 42, 0.95); position: fixed; top: 0; left: 0; right: 0; z-index: 40; border-bottom: 1px solid #1e293b; padding: 12px 16px;">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-2 sm:gap-4" style="max-width: 72rem; margin: 0 auto; display: flex; justify-content: space-between; align-items: center;">
             <div class="text-center md:text-left w-full md:w-auto">
-                <a href="{% url 'annuaire_boutiques' %}" class="inline-flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300 font-medium mb-0.5 transition">
+                <a href="{% url 'annuaire_boutiques' %}" class="inline-flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300 font-medium mb-0.5 transition" style="font-size: 12px; color: #60a5fa; text-decoration: none;">
                     ← Découvrir d'autres boutiques
                 </a>
-                <h1 class="text-lg sm:text-3xl font-bold tracking-tight text-white">{{ profil.nom }}</h1>
-                <p class="text-[11px] sm:text-sm text-slate-400">Vitrine vérifiée • Paiement & Livraison sécurisés</p>
+                <h1 class="text-lg sm:text-3xl font-bold tracking-tight text-white" style="font-size: 1.25rem; font-weight: bold; color: #ffffff; margin: 2px 0;">{{ profil.nom }}</h1>
+                <p class="text-[11px] sm:text-sm text-slate-400" style="font-size: 11px; color: #94a3b8;">Vitrine vérifiée • Paiement & Livraison sécurisés</p>
             </div>
-            <div class="flex items-center justify-center gap-2 sm:gap-3 w-full md:w-auto">
+            <div class="flex items-center justify-center gap-2 sm:gap-3 w-full md:w-auto" style="display: flex; gap: 8px; margin-top: 8px;">
                 <!-- Bouton Panier -->
-                <button onclick="ouvrirPanier()" class="flex-1 md:flex-initial justify-center bg-blue-600 hover:bg-blue-500 text-white font-medium px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-xs sm:text-sm transition flex items-center gap-2 shadow-lg shadow-blue-900/20 cursor-pointer">
+                <button onclick="ouvrirPanier()" class="flex-1 md:flex-initial justify-center bg-blue-600 hover:bg-blue-500 text-white font-medium px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-xs sm:text-sm transition flex items-center gap-2 shadow-lg shadow-blue-900/20 cursor-pointer" style="background: #2563eb; color: white; border: none; padding: 8px 16px; border-radius: 12px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px;">
                     🛒 Panier
-                    <span id="panier-compteur" class="bg-white text-blue-950 text-xs font-extrabold px-2 py-0.5 rounded-full">0</span>
+                    <span id="panier-compteur" class="bg-white text-blue-950 text-xs font-extrabold px-2 py-0.5 rounded-full" style="background: white; color: #020617; padding: 2px 8px; border-radius: 9999px; font-weight: 800; font-size: 12px;">0</span>
                 </button>
 
                 {% if profil.whatsapp_clean %}
-                <a href="https://wa.me/{{ profil.whatsapp_clean }}" target="_blank" class="flex-1 md:flex-initial justify-center bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-xs sm:text-sm transition flex items-center gap-2 shadow-lg shadow-emerald-900/20">
+                <a href="https://wa.me/{{ profil.whatsapp_clean }}" target="_blank" class="flex-1 md:flex-initial justify-center bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-xs sm:text-sm transition flex items-center gap-2 shadow-lg shadow-emerald-900/20" style="background: #16a34a; color: white; text-decoration: none; padding: 8px 16px; border-radius: 12px; font-weight: 500; display: flex; align-items: center; gap: 8px;">
                     💬 WhatsApp Vendeur
                 </a>
                 {% endif %}
@@ -38,95 +38,96 @@
     </header>
 
     <!-- Notification toast lors de l'ajout au panier -->
-    <div id="toast-panier" class="hidden fixed bottom-20 sm:bottom-6 left-1/2 -translate-x-1/2 z-50 bg-emerald-600 text-white text-xs sm:text-sm font-semibold px-5 py-3 rounded-2xl shadow-2xl whitespace-nowrap transition">
+    <div id="toast-panier" class="hidden fixed bottom-20 sm:bottom-6 left-1/2 -translate-x-1/2 z-50 bg-emerald-600 text-white text-xs sm:text-sm font-semibold px-5 py-3 rounded-2xl shadow-2xl whitespace-nowrap transition" style="display: none; position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); z-index: 50; background: #16a34a; color: white; padding: 12px 20px; border-radius: 16px; font-weight: 600; font-size: 14px;">
         ✅ Article ajouté au panier !
     </div>
 
     <!-- Bouton flottant pour ouvrir/fermer l'Assistant IA -->
-    <button onclick="toggleChatIA()" class="fixed bottom-5 right-5 z-50 bg-blue-600 hover:bg-blue-500 text-white font-bold p-3.5 sm:px-5 sm:py-3.5 rounded-full shadow-2xl shadow-blue-950 flex items-center gap-2.5 border border-blue-400/30 transition-transform hover:scale-105 cursor-pointer">
-        <span class="text-xl">✨</span>
-        <span class="hidden sm:inline text-xs font-semibold">Assistant IA</span>
+    <button onclick="toggleChatIA()" class="fixed bottom-5 right-5 z-50 bg-blue-600 hover:bg-blue-500 text-white font-bold p-3.5 sm:px-5 sm:py-3.5 rounded-full shadow-2xl shadow-blue-950 flex items-center gap-2.5 border border-blue-400/30 transition-transform hover:scale-105 cursor-pointer" style="position: fixed; bottom: 20px; right: 20px; z-index: 50; background: #2563eb; color: white; border: 1px solid rgba(96, 165, 250, 0.3); padding: 12px 20px; border-radius: 9999px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);">
+        <span style="font-size: 1.25rem;">✨</span>
+        <span style="font-size: 12px;">Assistant IA</span>
     </button>
 
-    <!-- Fenêtre Flottante du Chat IA (Popup) -->
-    <div id="modal-chat-ia" class="hidden fixed bottom-20 right-4 sm:right-6 z-50 w-[92%] sm:w-[380px] h-[480px] bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl flex flex-col overflow-hidden transition-all duration-300">
+    <!-- Fenêtre Flottante du Chat IA (Cachée par défaut en CSS inline) -->
+    <div id="modal-chat-ia" style="display: none; position: fixed; bottom: 80px; right: 16px; width: 92%; max-width: 380px; height: 480px; background: #0f172a; border: 1px solid #1e293b; border-radius: 24px; z-index: 9999; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); flex-direction: column; overflow: hidden;" class="hidden fixed bottom-20 right-4 sm:right-6 z-50 w-[92%] sm:w-[380px] h-[480px] bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl flex flex-col">
+        
         <!-- En-tête du Chat -->
-        <div class="flex items-center justify-between bg-slate-950 px-4 py-3 border-b border-slate-800">
-            <div class="flex items-center gap-2.5">
-                <span class="text-xl">✨</span>
+        <div style="display: flex; align-items: center; justify-content: space-between; background: #020617; padding: 12px 16px; border-bottom: 1px solid #1e293b;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 1.25rem;">✨</span>
                 <div>
-                    <h3 class="font-bold text-white text-xs sm:text-sm">Assistant Virtuel</h3>
-                    <p class="text-[10px] text-emerald-400 font-medium">● En ligne - Posez vos questions</p>
+                    <h3 style="font-weight: bold; color: white; font-size: 14px; margin: 0;">Assistant Virtuel</h3>
+                    <p style="font-size: 10px; color: #4ade80; margin: 0; font-weight: 500;">● En ligne - Posez vos questions</p>
                 </div>
             </div>
-            <button onclick="toggleChatIA()" class="text-slate-400 hover:text-white text-lg font-bold px-2 cursor-pointer">&times;</button>
+            <button onclick="toggleChatIA()" style="background: none; border: none; color: #94a3b8; font-size: 1.25rem; font-weight: bold; cursor: pointer; padding: 0 8px;">&times;</button>
         </div>
 
         <!-- Boîte de dialogue -->
-        <div id="chat-box" class="flex-grow overflow-y-auto p-4 space-y-3 text-xs sm:text-sm">
-            <div class="bg-slate-950/60 border border-slate-700/80 p-3 rounded-2xl text-slate-300 max-w-[85%] leading-relaxed">
+        <div id="chat-box" style="flex-grow: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; font-size: 13px;">
+            <div style="background: rgba(2, 6, 23, 0.6); border: 1px solid rgba(51, 65, 85, 0.8); padding: 12px; border-radius: 16px; color: #cbd5e1; max-width: 85%; line-height: 1.5;">
                 Bonjour ! 👋 Je suis l'assistant de <strong>{{ profil.nom }}</strong>. Quel produit recherchez-vous aujourd'hui ?
             </div>
         </div>
 
         <!-- Formulaire de saisie -->
-        <form id="chat-form" onsubmit="envoyerMessageIA(event)" class="p-3 bg-slate-950 border-t border-slate-800 flex gap-2">
-            <input type="text" id="chat-input" placeholder="Écrivez votre message..." autocomplete="off" class="flex-grow bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2 text-xs sm:text-sm text-white focus:outline-none focus:border-blue-500">
-            <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white px-3.5 py-2 rounded-xl transition font-medium text-xs sm:text-sm cursor-pointer">
+        <form id="chat-form" onsubmit="envoyerMessageIA(event)" style="padding: 12px; background: #020617; border-top: 1px solid #1e293b; display: flex; gap: 8px;">
+            <input type="text" id="chat-input" placeholder="Écrivez votre message..." autocomplete="off" style="flex-grow: 1; background: #0f172a; border: 1px solid #1e293b; border-radius: 12px; padding: 8px 12px; font-size: 13px; color: white; outline: none;">
+            <button type="submit" style="background: #2563eb; color: white; border: none; padding: 8px 14px; border-radius: 12px; font-weight: 500; font-size: 13px; cursor: pointer;">
                 Envoyer
             </button>
         </form>
     </div>
 
     <!-- Corps de la page / Catalogue -->
-    <main class="max-w-6xl mx-auto px-3 py-6 sm:p-8 flex-grow w-full space-y-6 pt-44 sm:pt-36">
+    <main style="max-width: 72rem; margin: 0 auto; padding: 12px; flex-grow: 1; width: 100%; padding-top: 150px; box-sizing: border-box;" class="max-w-6xl mx-auto px-3 py-6 sm:p-8 flex-grow w-full space-y-6 pt-44 sm:pt-36">
         
-        <h2 class="text-base sm:text-xl font-semibold text-slate-200 border-b border-slate-800 pb-3">
+        <h2 style="font-size: 1.1rem; font-weight: 600; color: #e2e8f0; border-bottom: 1px solid #1e293b; padding-bottom: 12px; margin-bottom: 20px;">
             📦 Articles Disponibles ({{ produits.count }})
         </h2>
 
         {% if produits %}
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
+            <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px;" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
                 {% for produit in produits %}
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-lg flex flex-col">
+                <div style="background: #0f172a; border: 1px solid #1e293b; border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3);" class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-lg flex flex-col">
                     {% if produit.image_base64 %}
-                    <div class="h-36 sm:h-48 w-full overflow-hidden bg-slate-800">
-                        <img src="{{ produit.image_base64 }}" alt="{{ produit.nom }}" class="w-full h-full object-cover">
+                    <div style="height: 140px; width: 100%; overflow: hidden; background: #1e293b;" class="h-36 sm:h-48 w-full overflow-hidden bg-slate-800">
+                        <img src="{{ produit.image_base64 }}" alt="{{ produit.nom }}" style="width: 100%; height: 100%; object-fit: cover;" class="w-full h-full object-cover">
                     </div>
                     {% endif %}
                     
-                    <div class="p-3 sm:p-4 flex flex-col flex-grow">
-                        <span class="text-[10px] sm:text-xs uppercase tracking-wider text-blue-400 font-semibold mb-1 truncate">{{ produit.get_categorie_display|default:produit.categorie }}</span>
-                        <h3 class="text-sm sm:text-base font-bold text-white mb-2 line-clamp-2">{{ produit.nom }}</h3>
+                    <div style="padding: 12px; display: flex; flex-direction: column; flex-grow: 1;" class="p-3 sm:p-4 flex flex-col flex-grow">
+                        <span style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: #60a5fa; font-weight: 600; margin-bottom: 4px;" class="text-[10px] sm:text-xs uppercase tracking-wider text-blue-400 font-semibold mb-1 truncate">{{ produit.get_categorie_display|default:produit.categorie }}</span>
+                        <h3 style="font-size: 14px; font-weight: bold; color: white; margin: 0 0 8px 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;" class="text-sm sm:text-base font-bold text-white mb-2 line-clamp-2">{{ produit.nom }}</h3>
                         
                         <!-- Bouton pour afficher/masquer les caractéristiques -->
                         {% if produit.caracteristiques %}
-                        <div class="mb-3">
-                            <button type="button" onclick="toggleCaracteristiques('{{ produit.id }}')" class="inline-flex items-center gap-1.5 text-[11px] font-semibold text-blue-400 hover:text-blue-300 bg-blue-950/40 border border-blue-900/50 px-2.5 py-1.5 rounded-xl transition cursor-pointer w-full justify-between">
+                        <div style="margin-bottom: 12px;">
+                            <button type="button" onclick="toggleCaracteristiques('{{ produit.id }}')" style="display: flex; align-items: center; justify-content: space-width; width: 100%; gap: 6px; font-size: 11px; font-weight: 600; color: #60a5fa; background: rgba(30, 58, 138, 0.4); border: 1px solid rgba(30, 58, 138, 0.5); padding: 6px 10px; border-radius: 10px; cursor: pointer;">
                                 <span>📄 Fiche technique</span>
-                                <span id="arrow-{{ produit.id }}" class="transform transition-transform duration-200">▼</span>
+                                <span id="arrow-{{ produit.id }}" style="transition: transform 0.2s;">▼</span>
                             </button>
                             
                             <!-- Contenu des caractéristiques (Caché par défaut) -->
-                            <div id="carac-{{ produit.id }}" class="hidden mt-2 bg-slate-950/70 border border-slate-800 p-2.5 rounded-xl text-xs text-slate-300 leading-relaxed">
+                            <div id="carac-{{ produit.id }}" style="display: none; margin-top: 8px; background: rgba(2, 6, 23, 0.7); border: 1px solid #1e293b; padding: 10px; border-radius: 10px; font-size: 11px; color: #cbd5e1; line-height: 1.4;">
                                 {{ produit.caracteristiques }}
                             </div>
                         </div>
                         {% endif %}
                         
-                        <div class="mt-auto pt-3 border-t border-slate-800 space-y-2.5">
-                            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
-                                <span class="text-xs sm:text-base font-extrabold text-emerald-400">{{ produit.prix }} FCFA</span>
-                                <span class="text-[10px] text-slate-400 bg-slate-800 px-2 py-0.5 rounded-lg w-fit">
+                        <div style="margin-top: auto; padding-top: 12px; border-top: 1px solid #1e293b; display: flex; flex-direction: column; gap: 8px;" class="mt-auto pt-3 border-t border-slate-800 space-y-2.5">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="font-size: 13px; font-weight: 800; color: #4ade80;" class="text-xs sm:text-base font-extrabold text-emerald-400">{{ produit.prix }} FCFA</span>
+                                <span style="font-size: 10px; color: #94a3b8; background: #1e293b; padding: 2px 8px; border-radius: 6px;" class="text-[10px] text-slate-400 bg-slate-800 px-2 py-0.5 rounded-lg w-fit">
                                     Stock : {{ produit.stock }}
                                 </span>
                             </div>
 
-                            <div class="grid grid-cols-1 gap-1.5">
-                                <button type="button" onclick="ajouterAuPanier('{{ produit.id }}', '{{ produit.nom|escapejs }}', '{{ produit.prix|escapejs }}')" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white text-[11px] font-semibold px-2 py-2 rounded-xl transition cursor-pointer">
+                            <div style="display: flex; flex-direction: column; gap: 6px;">
+                                <button type="button" onclick="ajouterAuPanier('{{ produit.id }}', '{{ produit.nom|escapejs }}', '{{ produit.prix|escapejs }}')" style="background: #1e293b; border: 1px solid #334155; color: white; font-size: 11px; font-weight: 600; padding: 8px; border-radius: 10px; cursor: pointer;" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white text-[11px] font-semibold px-2 py-2 rounded-xl transition cursor-pointer">
                                     🛒 Ajouter au panier
                                 </button>
-                                <a href="https://wa.me/{{ profil.whatsapp_clean }}?text=Bonjour,%20je%20souhaite%20réserver%20le%20produit%20:%20{{ produit.nom|urlencode }}%20au%20prix%20de%20{{ produit.prix|urlencode }}%20FCFA." target="_blank" class="bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-semibold px-2 py-2 rounded-xl transition text-center flex items-center justify-center">
+                                <a href="https://wa.me/{{ profil.whatsapp_clean }}?text=Bonjour,%20je%20souhaite%20réserver%20le%20produit%20:%20{{ produit.nom|urlencode }}%20au%20prix%20de%20{{ produit.prix|urlencode }}%20FCFA." target="_blank" style="background: #2563eb; color: white; text-decoration: none; font-size: 11px; font-weight: 600; padding: 8px; border-radius: 10px; text-align: center; display: block;" class="bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-semibold px-2 py-2 rounded-xl transition text-center flex items-center justify-center">
                                     Réserver direct ⚡
                                 </a>
                             </div>
@@ -136,7 +137,7 @@
                 {% endfor %}
             </div>
         {% else %}
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center text-slate-400 text-sm">
+            <div style="background: #0f172a; border: 1px solid #1e293b; border-radius: 16px; padding: 32px; text-align: center; color: #94a3b8; font-size: 14px;">
                 Aucun article n'est disponible pour le moment dans cette boutique. Revenez très vite !
             </div>
         {% endif %}
@@ -144,27 +145,27 @@
     </main>
 
     <!-- Fenêtre Modale du Panier -->
-    <div id="modal-panier" class="hidden fixed inset-0 bg-black/75 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 space-y-5 shadow-2xl">
-            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-                <h3 class="font-bold text-lg text-white">🛒 Votre Panier</h3>
-                <button onclick="fermerPanier()" class="text-slate-400 hover:text-white text-xl font-bold cursor-pointer">&times;</button>
+    <div id="modal-panier" style="display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.75); z-index: 9999; align-items: center; justify-content: center; padding: 16px;" class="hidden fixed inset-0 bg-black/75 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+        <div style="background: #0f172a; border: 1px solid #1e293b; border-radius: 24px; max-width: 400px; width: 100%; padding: 24px; display: flex; flex-direction: column; gap: 20px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);" class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 space-y-5 shadow-2xl">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1e293b; padding-bottom: 12px;">
+                <h3 style="font-weight: bold; font-size: 1.1rem; color: white; margin: 0;">🛒 Votre Panier</h3>
+                <button onclick="fermerPanier()" style="background: none; border: none; color: #94a3b8; font-size: 1.5rem; font-weight: bold; cursor: pointer;">&times;</button>
             </div>
 
-            <div id="panier-liste" class="space-y-3 max-h-64 overflow-y-auto text-sm">
+            <div id="panier-liste" style="display: flex; flex-direction: column; gap: 12px; max-height: 250px; overflow-y: auto; font-size: 14px;">
                 <!-- Contenu généré par JavaScript -->
             </div>
 
-            <div class="border-t border-slate-800 pt-4 space-y-3">
-                <div class="flex justify-between items-center text-sm font-bold">
-                    <span class="text-slate-400">Total estimé :</span>
-                    <span id="panier-total" class="text-emerald-400 text-base">0 FCFA</span>
+            <div style="border-top: 1px solid #1e293b; paddingTop: 16px; display: flex; flex-direction: column; gap: 12px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 14px; font-weight: bold;">
+                    <span style="color: #94a3b8;">Total estimé :</span>
+                    <span id="panier-total" style="color: #4ade80; font-size: 1.1rem;">0 FCFA</span>
                 </div>
-                <div class="grid grid-cols-2 gap-2">
-                    <button onclick="viderPanier()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-2.5 px-4 rounded-xl text-xs transition cursor-pointer">
-                        🗑 Vider le panier
+                <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px;">
+                    <button onclick="viderPanier()" style="background: #1e293b; border: none; color: #cbd5e1; font-weight: 600; padding: 10px; border-radius: 12px; font-size: 12px; cursor: pointer;">
+                        🗑 Vider
                     </button>
-                    <button onclick="commanderPanierWhatsApp()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 px-4 rounded-xl text-xs transition shadow-lg shadow-emerald-900/20 cursor-pointer">
+                    <button onclick="commanderPanierWhatsApp()" style="background: #16a34a; border: none; color: white; font-weight: 600; padding: 10px; border-radius: 12px; font-size: 12px; cursor: pointer;">
                         📲 Commander
                     </button>
                 </div>
@@ -173,7 +174,7 @@
     </div>
 
     <!-- Pied de page -->
-    <footer class="bg-slate-900 border-t border-slate-800 text-center py-4 text-xs text-slate-500 mt-auto">
+    <footer style="background: #0f172a; border-top: 1px solid #1e293b; text-align: center; padding: 16px; font-size: 12px; color: #64748b; margin-top: auto;">
         Propulsé par la plateforme e-commerce multi-tenant SaaS • Tous droits réservés
     </footer>
 
@@ -182,20 +183,30 @@
         const CLE_PANIER = "panier_{{ profil.slug }}";
         let panier = JSON.parse(localStorage.getItem(CLE_PANIER) || "[]");
 
+        // Fonction robuste pour afficher/masquer le chat IA (gère le style inline et la classe)
         function toggleChatIA() {
             const modalChat = document.getElementById('modal-chat-ia');
-            modalChat.classList.toggle('hidden');
+            if (modalChat.style.display === 'none' || modalChat.style.display === '') {
+                modalChat.style.display = 'flex';
+                modalChat.classList.remove('hidden');
+            } else {
+                modalChat.style.display = 'none';
+                modalChat.classList.add('hidden');
+            }
         }
 
-        // Fonction pour afficher/masquer les caractéristiques d'un produit
+        // Fonction robuste pour afficher/masquer les caractéristiques
         function toggleCaracteristiques(produitId) {
             const caracDiv = document.getElementById(`carac-${produitId}`);
             const arrow = document.getElementById(`arrow-${produitId}`);
             
             if (caracDiv) {
-                caracDiv.classList.toggle('hidden');
-                if (arrow) {
-                    arrow.style.transform = caracDiv.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
+                if (caracDiv.style.display === 'none' || caracDiv.style.display === '') {
+                    caracDiv.style.display = 'block';
+                    if (arrow) arrow.style.transform = 'rotate(180deg)';
+                } else {
+                    caracDiv.style.display = 'none';
+                    if (arrow) arrow.style.transform = 'rotate(0deg)';
                 }
             }
         }
@@ -240,7 +251,7 @@
             compteur.textContent = nbArticles;
             
             if (panier.length === 0) {
-                liste.innerHTML = `<p class="text-slate-500 text-center py-6">Votre panier est vide pour le moment.</p>`;
+                liste.innerHTML = `<p style="color: #64748b; text-align: center; padding: 20px;">Votre panier est vide pour le moment.</p>`;
                 totalEl.textContent = "0 FCFA";
                 return;
             }
@@ -250,12 +261,12 @@
                 const prixUnitaire = extraireNombre(item.prix);
                 total += prixUnitaire * item.quantite;
                 return `
-                    <div class="flex items-center justify-between bg-slate-950 border border-slate-800 p-3 rounded-2xl">
+                    <div style="display: flex; align-items: center; justify-content: space-between; background: #020617; border: 1px solid #1e293b; padding: 12px; border-radius: 12px;">
                         <div>
-                            <p class="font-bold text-white text-xs">${item.nom}</p>
-                            <p class="text-xs text-slate-400 mt-0.5">${item.quantite} x ${item.prix} FCFA</p>
+                            <p style="font-weight: bold; color: white; font-size: 12px; margin: 0;">${item.nom}</p>
+                            <p style="font-size: 11px; color: #94a3b8; margin: 2px 0 0 0;">${item.quantite} x ${item.prix} FCFA</p>
                         </div>
-                        <button onclick="retirerDuPanier('${item.id}')" class="text-red-400 hover:text-red-300 text-xs font-bold px-2 py-1 cursor-pointer">
+                        <button onclick="retirerDuPanier('${item.id}')" style="color: #f87171; background: none; border: none; font-size: 11px; font-weight: bold; cursor: pointer;">
                             Retirer
                         </button>
                     </div>`;
@@ -266,11 +277,11 @@
 
         function ouvrirPanier() {
             majInterfacePanier();
-            document.getElementById('modal-panier').classList.remove('hidden');
+            document.getElementById('modal-panier').style.display = 'flex';
         }
 
         function fermerPanier() {
-            document.getElementById('modal-panier').classList.add('hidden');
+            document.getElementById('modal-panier').style.display = 'none';
         }
 
         function commanderPanierWhatsApp() {
@@ -288,8 +299,8 @@
         function afficherToast(texte) {
             const toast = document.getElementById('toast-panier');
             toast.textContent = texte;
-            toast.classList.remove('hidden');
-            setTimeout(() => toast.classList.add('hidden'), 2500);
+            toast.style.display = 'block';
+            setTimeout(() => toast.style.display = 'none', 2500);
         }
 
         majInterfacePanier();
@@ -302,7 +313,7 @@
             
             if (!message) return;
             
-            chatBox.innerHTML += `<div class="bg-blue-600/20 border border-blue-500/30 text-blue-100 p-3 rounded-2xl max-w-[85%] ml-auto leading-relaxed">${message}</div>`;
+            chatBox.innerHTML += `<div style="background: rgba(37, 99, 235, 0.2); border: 1px solid rgba(59, 130, 246, 0.3); color: #eff6ff; padding: 10px 14px; border-radius: 16px; max-width: 85%; margin-left: auto; line-height: 1.4;">${message}</div>`;
             input.value = '';
             chatBox.scrollTop = chatBox.scrollHeight;
             
@@ -319,9 +330,9 @@
                     })
                 });
                 const data = await response.json();
-                chatBox.innerHTML += `<div class="bg-slate-950/60 border border-slate-700 p-3 rounded-2xl text-slate-300 max-w-[85%] leading-relaxed">${data.reponse}</div>`;
+                chatBox.innerHTML += `<div style="background: rgba(2, 6, 23, 0.6); border: 1px solid #334155; padding: 10px 14px; border-radius: 16px; color: #cbd5e1; max-width: 85%; line-height: 1.4;">${data.reponse}</div>`;
             } catch (err) {
-                chatBox.innerHTML += `<div class="bg-red-500/10 border border-red-500/20 text-red-300 p-3 rounded-2xl max-w-[85%]">Désolé, une erreur est survenue.</div>`;
+                chatBox.innerHTML += `<div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); color: #fca5a5; padding: 10px 14px; border-radius: 16px; max-width: 85%;">Désolé, une erreur est survenue.</div>`;
             }
             chatBox.scrollTop = chatBox.scrollHeight;
         }
