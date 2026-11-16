@@ -1,15 +1,18 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nos Boutiques Partenaires</title>
-    <script src="https://tailwindcss.com"></script>
+    <link rel="stylesheet" href="{% static 'css/global.css' %}">
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
+
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between">
 
     <!-- En-tête -->
