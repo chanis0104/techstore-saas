@@ -4,71 +4,70 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inscription Vendeur — Créez votre boutique SaaS</title>
-    <script src="https://tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://googleapis.com');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
-        input[type="text"], input[type="password"] {
+        input, select {
             width: 100%;
             background-color: #f8fafc;
             border: 1px solid #e2e8f0;
             border-radius: 1rem;
             padding: 0.75rem 1rem;
-            font-size: 0.875rem;
-            color: #0f172a;
+            font-size: 0.85rem;
             outline: none;
             transition: all 0.2s;
+            color: #0f172a;
         }
-        input[type="text"]:focus, input[type="password"]:focus {
+        input:focus, select:focus {
             border-color: #2563eb;
-            background-color: #ffffff;
+            background-color: #fff;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
     </style>
 </head>
-<body class="min-h-full bg-slate-950 text-slate-900 flex items-center justify-center p-4">
-
-    <div class="max-w-md w-full bg-white rounded-3xl shadow-2xl p-8 space-y-6">
+<body class="min-h-full flex items-center justify-center bg-slate-900 text-slate-900 px-4 py-12 selection:bg-blue-600 selection:text-white">
+    <div class="max-w-md w-full bg-white rounded-3xl p-8 shadow-2xl space-y-6">
         <div class="text-center space-y-2">
-            <div class="w-14 h-14 rounded-2xl bg-blue-600 text-white flex items-center justify-center text-2xl mx-auto shadow-lg shadow-blue-500/30">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-500 mx-auto flex items-center justify-center text-xl text-white font-black shadow-lg shadow-blue-500/30">
                 ⚡
             </div>
-            <h1 class="text-2xl font-extrabold tracking-tight text-slate-900">Lancez votre boutique SaaS</h1>
-            <p class="text-xs text-slate-500 font-medium">Créez votre compte marchand en 1 minute</p>
+            <h1 class="font-extrabold text-xl text-slate-900">Lancez votre boutique SaaS</h1>
+            <p class="text-xs text-slate-500">Créez votre compte marchand en 1 minute</p>
         </div>
 
         <form method="POST" class="space-y-4">
             {% csrf_token %}
-
+            
+            <!-- Affichage des erreurs du formulaire si la soumission échoue -->
             {% if form.errors %}
-            <div class="bg-red-50 border border-red-200 text-red-700 text-xs p-3.5 rounded-2xl">
-                ⚠️ Veuillez corriger les erreurs : {{ form.errors }}
+            <div class="bg-red-50 border border-red-200 text-red-600 p-3 rounded-2xl text-[11px] space-y-1">
+                <span class="font-extrabold">⚠️ Veuillez corriger les erreurs :</span>
+                {{ form.errors }}
             </div>
             {% endif %}
 
+            <!-- Affichage propre des champs du UserCreationForm de Django -->
             {% for field in form %}
             <div>
-                <label class="block text-[11px] font-extrabold uppercase tracking-wider text-slate-500 mb-1.5">
-                    {{ field.label }} *
-                </label>
+                <label class="block text-[11px] font-extrabold uppercase text-slate-500 mb-1">{{ field.label }} *</label>
                 {{ field }}
                 {% if field.errors %}
-                <p class="text-red-600 text-xs mt-1">{{ field.errors.0 }}</p>
+                    <span class="text-red-500 text-[10px] mt-1 block">{{ field.errors.0 }}</span>
                 {% endif %}
             </div>
             {% endfor %}
 
+            <hr class="border-slate-100 my-2">
+
             <div>
-                <label class="block text-[11px] font-extrabold uppercase tracking-wider text-slate-500 mb-1.5">
-                    Nom de votre boutique *
-                </label>
-                <input type="text" name="nom_boutique" placeholder="Ex: Élégance Mode, TechStore, Maison Bella..." required>
+                <label class="block text-[11px] font-extrabold uppercase text-slate-500 mb-1">Nom de votre boutique *</label>
+                <input type="text" name="nom_boutique" required placeholder="Ex: TechShop Pro">
             </div>
 
             <div>
-                <label class="block text-[11px] font-extrabold uppercase tracking-wider text-slate-500 mb-1.5">
-                    Secteur d'activité *
-                </label>
-                <select name="secteur" required class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:bg-white transition-all cursor-pointer">
+                <label class="block text-[11px] font-extrabold uppercase text-slate-500 mb-1">Secteur d'activité *</label>
+                <select name="secteur" required class="cursor-pointer">
                     {% for code, label in secteurs %}
                         <option value="{{ code }}">{{ label }}</option>
                     {% endfor %}
@@ -76,22 +75,18 @@
             </div>
 
             <div>
-                <label class="block text-[11px] font-extrabold uppercase tracking-wider text-slate-500 mb-1.5">
-                    Numéro WhatsApp (avec indicatif) *
-                </label>
-                <input type="text" name="whatsapp" placeholder="Ex: +225 07 00 00 00 00" required>
+                <label class="block text-[11px] font-extrabold uppercase text-slate-500 mb-1">Numéro WhatsApp (avec indicatif) *</label>
+                <input type="text" name="whatsapp" required placeholder="Ex: +237 600000000">
             </div>
 
-            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-sm py-3.5 rounded-2xl transition-all shadow-lg shadow-blue-500/25 cursor-pointer">
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black text-xs py-3.5 rounded-2xl shadow-lg shadow-blue-500/25 transition">
                 Créer ma boutique 🚀
             </button>
         </form>
 
-        <p class="text-center text-xs text-slate-500">
-            Déjà un compte vendeur ? 
-            <a href="{% url 'connexion' %}" class="font-bold text-blue-600 hover:underline">Se connecter</a>
-        </p>
+        <div class="text-center pt-2">
+            <p class="text-xs text-slate-400">Déjà un compte vendeur ? <a href="{% url 'connexion' %}" class="text-blue-600 font-bold hover:underline">Se connecter</a></p>
+        </div>
     </div>
-
 </body>
 </html>

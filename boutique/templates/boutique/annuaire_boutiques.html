@@ -1,167 +1,95 @@
 <!DOCTYPE html>
-<html lang="fr" class="h-full">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nos Boutiques Partenaires — Centre Commercial en Ligne</title>
-    <script src="https://tailwindcss.com"></script>
-    <style>
-        @import url('https://googleapis.com');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
-    </style>
+    <title>Nos Boutiques Partenaires</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="min-h-full flex flex-col bg-slate-950 text-slate-100">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between">
 
-    <!-- Barre de navigation -->
-    <header class="bg-slate-900/90 backdrop-blur-md border-b border-slate-800 sticky top-0 z-30">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between gap-4">
-            <a href="{% url 'accueil' %}" class="flex items-center gap-2.5">
-                <span class="text-2xl">🚀</span>
-                <span class="font-extrabold text-lg sm:text-xl tracking-tight text-white">Nos Boutiques</span>
+    <!-- En-tête -->
+    <header class="p-6 max-w-6xl mx-auto w-full flex justify-between items-center border-b border-slate-800">
+        <div class="text-xl font-bold text-white tracking-wider flex items-center gap-2">
+            <span>🚀</span> Nos Boutiques
+        </div>
+        <div class="flex items-center gap-4">
+            <!-- Bouton Admin Sécurisé (discret) -->
+            <a href="/admin/" class="text-xs text-slate-500 hover:text-slate-300 border border-slate-800 px-3 py-1.5 rounded-lg transition">
+                🔒 Admin
             </a>
-
-            <div class="flex items-center gap-2 sm:gap-3">
-                <a href="/admin/" class="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-white px-3 py-2 rounded-xl transition">
-                    🔒 Admin
-                </a>
-                <a href="{% url 'connexion' %}" class="text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 px-3.5 py-2.5 rounded-xl transition">
-                    Connexion Vendeur
-                </a>
-                <a href="{% url 'inscription' %}" class="text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 rounded-xl transition shadow-lg shadow-blue-600/20">
-                    Créer ma boutique
-                </a>
-            </div>
+            <a href="{% url 'connexion' %}" class="text-slate-300 hover:text-white px-3.5 py-2 text-sm font-medium transition">Connexion Vendeur</a>
+            <a href="{% url 'inscription' %}" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-xl text-sm font-medium transition shadow-lg shadow-blue-900/20">Créer ma boutique</a>
         </div>
     </header>
 
-    <!-- Contenu Principal -->
-    <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 py-10 flex-grow space-y-8">
-        
-        <!-- En-tête & Barre de recherche -->
-        <div class="text-center max-w-2xl mx-auto space-y-4">
-            <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
+    <!-- Corps de la page : Liste des boutiques marchandes -->
+    <main class="max-w-4xl mx-auto px-6 py-12 flex-grow w-full">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight mb-3">
                 Choisissez votre boutique
             </h1>
-            <p class="text-sm text-slate-400">
-                Découvrez les catalogues en ligne de nos marchands partenaires par secteur d'activité et commandez directement sur WhatsApp.
+            <p class="text-slate-400 text-sm md:text-base">
+                Découvrez les catalogues en ligne de nos marchands partenaires et commandez directement.
             </p>
-
-            <div class="pt-2">
-                <input type="text" id="recherche-boutique" onkeyup="filtrerBoutiques()" placeholder="🔍 Rechercher une boutique par nom..." class="w-full bg-slate-900 border border-slate-800 rounded-2xl px-5 py-3.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition">
-            </div>
         </div>
 
-        <!-- Filtres par Secteur -->
-        <div class="flex flex-wrap items-center justify-center gap-2">
-            <button type="button" onclick="selectionnerSecteur('TOUS', this)" class="btn-secteur active bg-blue-600 text-white text-xs font-bold px-4 py-2 rounded-xl transition cursor-pointer">
-                🏬 Toutes les boutiques
+        <!-- Filtres rapides par secteur -->
+        <div class="flex flex-wrap items-center justify-center gap-2 mb-8">
+            <button type="button" onclick="filtrerSecteur('TOUS', this)" class="btn-secteur bg-blue-600 text-white px-3.5 py-1.5 rounded-xl text-xs font-medium transition">
+                Tout voir
             </button>
             {% for code, label in secteurs %}
-            <button type="button" onclick="selectionnerSecteur('{{ code }}', this)" class="btn-secteur bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 text-xs font-bold px-4 py-2 rounded-xl transition cursor-pointer">
+            <button type="button" onclick="filtrerSecteur('{{ code }}', this)" class="btn-secteur bg-slate-900 border border-slate-800 hover:border-blue-500/50 text-slate-300 px-3.5 py-1.5 rounded-xl text-xs font-medium transition">
                 {{ label }}
             </button>
             {% endfor %}
         </div>
 
-        <!-- Grille des Boutiques -->
-        {% if boutiques %}
-            <div id="grille-boutiques" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {% for boutique in boutiques %}
-                <div class="carte-boutique bg-slate-900 border border-slate-800 hover:border-blue-500/50 rounded-3xl p-6 flex flex-col justify-between transition shadow-xl" data-secteur="{{ boutique.secteur }}" data-nom="{{ boutique.nom|lower }}">
-                    <div class="space-y-3">
-                        <div class="flex items-center justify-between gap-2">
-                            <span class="inline-block text-[11px] font-extrabold uppercase tracking-wider bg-blue-500/10 text-blue-400 border border-blue-500/20 px-3 py-1 rounded-full">
-                                {{ boutique.get_secteur_display }}
-                            </span>
-                            <span class="text-xs text-slate-500 font-semibold">
-                                {{ boutique.produits.count }} article{{ boutique.produits.count|pluralize }}
-                            </span>
-                        </div>
-
-                        <h2 class="text-xl font-extrabold text-white pt-1">{{ boutique.nom }}</h2>
-                        <p class="text-xs text-slate-400 leading-relaxed">
-                            Visiter la vitrine, découvrir les articles disponibles et discuter avec l'assistant IA.
-                        </p>
-                    </div>
-
-                    <div class="pt-6 mt-6 border-t border-slate-800/80">
-                        <a href="{% url 'catalogue' boutique.slug %}" class="w-full inline-flex items-center justify-center gap-2 bg-slate-800 hover:bg-blue-600 text-white text-xs font-extrabold py-3 px-4 rounded-2xl transition">
-                            <span>Accéder au catalogue</span>
-                            <span>→</span>
-                        </a>
-                    </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {% for boutique in boutiques %}
+            <a href="{% url 'catalogue' boutique.slug %}" data-secteur="{{ boutique.secteur }}" class="carte-boutique bg-slate-900 border border-slate-800 hover:border-blue-500/50 p-6 rounded-2xl transition shadow-lg flex flex-col justify-between group">
+                <div>
+                    <span class="inline-block text-[11px] font-semibold text-blue-400 bg-blue-500/10 border border-blue-500/20 px-2.5 py-0.5 rounded-full mb-3">
+                        {{ boutique.get_secteur_display }}
+                    </span>
+                    <h2 class="text-xl font-bold text-white group-hover:text-blue-400 transition mb-2">
+                        {{ boutique.nom }}
+                    </h2>
+                    <p class="text-slate-400 text-sm">
+                        Visiter la vitrine, découvrir les articles et discuter avec l'assistant IA.
+                    </p>
                 </div>
-                {% endfor %}
-            </div>
-
-            <div id="aucun-resultat" class="hidden bg-slate-900 border border-slate-800 rounded-3xl p-10 text-center space-y-2">
-                <p class="text-base font-bold text-white">Aucune boutique trouvée dans cette catégorie</p>
-                <p class="text-xs text-slate-400">Essayez un autre secteur ou créez votre propre boutique gratuitement.</p>
-            </div>
-        {% else %}
-            <div class="bg-slate-900 border border-slate-800 rounded-3xl p-12 text-center space-y-4 max-w-lg mx-auto">
-                <span class="text-4xl block">🏪</span>
-                <h2 class="text-lg font-extrabold text-white">Aucune boutique partenaire pour le moment</h2>
-                <p class="text-xs text-slate-400">Soyez le premier commerçant à ouvrir votre vitrine en ligne en moins d'une minute.</p>
-                <a href="{% url 'inscription' %}" class="inline-block bg-blue-600 hover:bg-blue-500 text-white text-xs font-extrabold px-6 py-3 rounded-2xl transition">
-                    Lancer ma boutique 🚀
-                </a>
-            </div>
-        {% endif %}
-
+                <div class="mt-6 flex items-center justify-between pt-4 border-t border-slate-800 text-sm font-medium text-blue-400">
+                    <span>Accéder au catalogue</span>
+                    <span class="group-hover:translate-x-1 transition">→</span>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
     </main>
 
     <!-- Pied de page -->
-    <footer class="bg-slate-900 border-t border-slate-800 py-6 text-center text-xs text-slate-500 mt-auto">
+    <footer class="bg-slate-900 border-t border-slate-800 py-6 text-center text-xs text-slate-500">
         Plateforme E-Commerce Multi-Tenant SaaS &bull; Tous droits réservés
     </footer>
 
-    <!-- Script de filtrage instantané -->
     <script>
-        let secteurActuel = 'TOUS';
-
-        function selectionnerSecteur(code, bouton) {
-            secteurActuel = code;
-
+        function filtrerSecteur(code, bouton) {
             document.querySelectorAll('.btn-secteur').forEach(btn => {
                 btn.classList.remove('bg-blue-600', 'text-white');
-                btn.classList.add('bg-slate-900', 'text-slate-300', 'border', 'border-slate-800');
+                btn.classList.add('bg-slate-900', 'border', 'border-slate-800', 'text-slate-300');
             });
-
-            bouton.classList.remove('bg-slate-900', 'text-slate-300', 'border', 'border-slate-800');
+            bouton.classList.remove('bg-slate-900', 'border', 'border-slate-800', 'text-slate-300');
             bouton.classList.add('bg-blue-600', 'text-white');
 
-            filtrerBoutiques();
-        }
-
-        function filtrerBoutiques() {
-            const recherche = document.getElementById('recherche-boutique').value.toLowerCase().trim();
-            const cartes = document.querySelectorAll('.carte-boutique');
-            let visibles = 0;
-
-            cartes.forEach(carte => {
-                const secteurCarte = carte.getAttribute('data-secteur');
-                const nomCarte = carte.getAttribute('data-nom');
-
-                const matchSecteur = (secteurActuel === 'TOUS' || secteurCarte === secteurActuel);
-                const matchNom = nomCarte.includes(recherche);
-
-                if (matchSecteur && matchNom) {
+            document.querySelectorAll('.carte-boutique').forEach(carte => {
+                if (code === 'TOUS' || carte.getAttribute('data-secteur') === code) {
                     carte.classList.remove('hidden');
-                    visibles++;
                 } else {
                     carte.classList.add('hidden');
                 }
             });
-
-            const msgVide = document.getElementById('aucun-resultat');
-            if (msgVide) {
-                if (visibles === 0) {
-                    msgVide.classList.remove('hidden');
-                } else {
-                    msgVide.classList.add('hidden');
-                }
-            }
         }
     </script>
 

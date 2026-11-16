@@ -95,7 +95,7 @@
                     <input type="hidden" name="action" value="ajouter_produit">
                     
                     <div>
-                        <label class="block text-[11px] font-extrabold uppercase tracking-wider text-slate-500 mb-1.5">Nom du produit ou service *</label>
+                        <label class="block text-[11px] font-extrabold uppercase tracking-wider text-slate-500 mb-1.5">Nom du modèle / article *</label>
                         <input type="text" name="nom" placeholder="Ex: iPhone 13 Pro, Robe d'été, Sérum Vitamine C..." required class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-xs focus:outline-none focus:border-blue-600 focus:bg-white transition-all">
                     </div>
                     
@@ -125,7 +125,7 @@
 
                     <div>
                         <label class="block text-[11px] font-extrabold uppercase tracking-wider text-slate-500 mb-1.5">Fiche technique & Description *</label>
-                        <textarea name="caracteristiques" rows="4" placeholder="Ex: Taille M/L, couleur noire, livraison disponible..." required class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-xs focus:outline-none focus:border-blue-600 focus:bg-white transition-all"></textarea>
+                        <textarea name="caracteristiques" rows="4" placeholder="Ex: Taille, couleur, capacité, état..." required class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-xs focus:outline-none focus:border-blue-600 focus:bg-white transition-all"></textarea>
                     </div>
 
                     <div>
@@ -202,7 +202,7 @@
                                         {% if p.image_base64 %}
                                             <img src="{{ p.image_base64 }}" alt="{{ p.nom }}" class="w-full h-full object-cover">
                                         {% else %}
-                                            <span class="text-xl">📦</span>
+                                            <span class="text-xl">📱</span>
                                         {% endif %}
                                     </div>
                                     <div>
