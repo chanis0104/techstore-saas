@@ -1,37 +1,33 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ profil.nom }} - Vitrine</title>
     <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://tailwindcss.com"></script>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col">
 
     <!-- En-tête de la Boutique -->
-    <header class="bg-slate-900 border-b border-slate-800 p-6 shadow-md sticky top-0 z-30">
-        <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-            <div>
-                <!-- Lien de retour à l'annuaire -->
-                <div class="mb-2">
-                   <a href="{% url 'annuaire_boutiques' %}" class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-400 hover:text-white bg-slate-800/80 hover:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700/50 transition">
-    ← Découvrir d'autres boutiques
-</a>
-                </div>
-                <h1 class="text-3xl font-bold tracking-tight text-white">{{ profil.nom }}</h1>
-                <p class="text-sm text-slate-400 mt-1">Vitrine vérifiée • Paiement & Livraison sécurisés</p>
+    <header class="bg-slate-900/95 backdrop-blur-md border-b border-slate-800 px-4 py-4 sm:p-6 shadow-md sticky top-0 z-30">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-3 sm:gap-4">
+            <div class="text-center md:text-left w-full md:w-auto">
+                <a href="{% url 'annuaire_boutiques' %}" class="inline-flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300 font-medium mb-1 transition">
+                    ← Découvrir d'autres boutiques
+                </a>
+                <h1 class="text-xl sm:text-3xl font-bold tracking-tight text-white">{{ profil.nom }}</h1>
+                <p class="text-xs sm:text-sm text-slate-400 mt-0.5">Vitrine vérifiée • Paiement & Livraison sécurisés</p>
             </div>
-            
-            <div class="flex items-center gap-3">
+            <div class="flex items-center justify-center gap-2 sm:gap-3 w-full md:w-auto">
                 <!-- Bouton Panier -->
-                <button onclick="ouvrirPanier()" class="bg-blue-600 hover:bg-blue-500 text-white font-medium px-5 py-2.5 rounded-xl transition flex items-center gap-2 shadow-lg shadow-blue-900/20 relative">
+                <button onclick="ouvrirPanier()" class="flex-1 md:flex-initial justify-center bg-blue-600 hover:bg-blue-500 text-white font-medium px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-xs sm:text-sm transition flex items-center gap-2 shadow-lg shadow-blue-900/20 cursor-pointer">
                     🛒 Panier
                     <span id="panier-compteur" class="bg-white text-blue-950 text-xs font-extrabold px-2 py-0.5 rounded-full">0</span>
                 </button>
 
                 {% if profil.whatsapp_clean %}
-                <a href="https://wa.me/{{ profil.whatsapp_clean }}" target="_blank" class="bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-5 py-2.5 rounded-xl transition flex items-center gap-2 shadow-lg shadow-emerald-900/20">
+                <a href="https://wa.me{{ profil.whatsapp_clean }}" target="_blank" class="flex-1 md:flex-initial justify-center bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-xs sm:text-sm transition flex items-center gap-2 shadow-lg shadow-emerald-900/20">
                     💬 WhatsApp Vendeur
                 </a>
                 {% endif %}
@@ -40,49 +36,55 @@
     </header>
 
     <!-- Notification toast lors de l'ajout au panier -->
-    <div id="toast-panier" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-emerald-600 text-white text-sm font-semibold px-5 py-3 rounded-2xl shadow-2xl transition">
+    <div id="toast-panier" class="hidden fixed bottom-20 sm:bottom-6 left-1/2 -translate-x-1/2 z-50 bg-emerald-600 text-white text-xs sm:text-sm font-semibold px-5 py-3 rounded-2xl shadow-2xl whitespace-nowrap transition">
         ✅ Article ajouté au panier !
     </div>
 
+    <!-- Bouton flottant mobile pour accéder directement à l'Assistant IA -->
+    <a href="#section-assistant" class="lg:hidden fixed bottom-5 right-5 z-40 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-4 py-3.5 rounded-full shadow-2xl shadow-blue-950 flex items-center gap-2 border border-blue-400/30">
+        <span>✨</span>
+        <span>Aide IA</span>
+    </a>
+
     <!-- Corps de la page / Catalogue et Chatbot -->
-    <main class="max-w-6xl mx-auto p-6 flex-grow w-full grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <main class="max-w-6xl mx-auto px-3 py-5 sm:p-6 flex-grow w-full grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
         
-        <!-- Liste des Produits (2 colonnes sur 3) -->
-        <div class="lg:col-span-2 space-y-6">
-            <h2 class="text-xl font-semibold text-slate-200 border-b border-slate-800 pb-3">
+        <!-- Liste des Produits -->
+        <div class="lg:col-span-2 space-y-4 sm:space-y-6">
+            <h2 class="text-base sm:text-xl font-semibold text-slate-200 border-b border-slate-800 pb-3">
                 📦 Articles Disponibles ({{ produits.count }})
             </h2>
 
             {% if produits %}
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-2 gap-3 sm:gap-6">
                     {% for produit in produits %}
                     <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-lg flex flex-col">
                         {% if produit.image_base64 %}
-                        <div class="h-48 w-full overflow-hidden bg-slate-800">
+                        <div class="h-36 sm:h-48 w-full overflow-hidden bg-slate-800">
                             <img src="{{ produit.image_base64 }}" alt="{{ produit.nom }}" class="w-full h-full object-cover">
                         </div>
                         {% endif %}
-                        <div class="p-5 flex flex-col flex-grow">
-                            <span class="text-xs uppercase tracking-wider text-blue-400 font-semibold mb-1">{{ produit.get_categorie_display|default:produit.categorie }}</span>
-                            <h3 class="text-lg font-bold text-white mb-2">{{ produit.nom }}</h3>
-                            <p class="text-slate-400 text-sm mb-4 flex-grow">{{ produit.caracteristiques|default:"Aucune description spécifique." }}</p>
+                        <div class="p-3 sm:p-5 flex flex-col flex-grow">
+                            <span class="text-[10px] sm:text-xs uppercase tracking-wider text-blue-400 font-semibold mb-1 truncate">{{ produit.get_categorie_display|default:produit.categorie }}</span>
+                            <h3 class="text-sm sm:text-lg font-bold text-white mb-1.5 sm:mb-2 line-clamp-2">{{ produit.nom }}</h3>
+                            <p class="text-slate-400 text-xs sm:text-sm mb-3 sm:mb-4 flex-grow line-clamp-2 sm:line-clamp-3">{{ produit.caracteristiques|default:"Aucune description spécifique." }}</p>
                             
-                            <div class="mt-auto pt-4 border-t border-slate-800 space-y-3">
-                                <div class="flex justify-between items-center">
+                            <div class="mt-auto pt-3 sm:pt-4 border-t border-slate-800 space-y-2.5 sm:space-y-3">
+                                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
                                     <div>
-                                        <span class="text-xs text-slate-500 block">Prix de vente</span>
-                                        <span class="text-lg font-extrabold text-emerald-400">{{ produit.prix }} FCFA</span>
+                                        <span class="hidden sm:block text-xs text-slate-500">Prix de vente</span>
+                                        <span class="text-sm sm:text-lg font-extrabold text-emerald-400">{{ produit.prix }} FCFA</span>
                                     </div>
-                                    <span class="text-xs text-slate-400 bg-slate-800 px-2.5 py-1 rounded-lg">
+                                    <span class="self-start sm:self-auto text-[10px] sm:text-xs text-slate-400 bg-slate-800 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg">
                                         Stock : {{ produit.stock }}
                                     </span>
                                 </div>
 
-                                <div class="grid grid-cols-2 gap-2">
-                                    <button type="button" onclick="ajouterAuPanier('{{ produit.id }}', '{{ produit.nom|escapejs }}', '{{ produit.prix|escapejs }}')" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white text-xs font-semibold px-3 py-2.5 rounded-xl transition">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 sm:gap-2">
+                                    <button type="button" onclick="ajouterAuPanier('{{ produit.id }}', '{{ produit.nom|escapejs }}', '{{ produit.prix|escapejs }}')" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white text-[11px] sm:text-xs font-semibold px-2.5 py-2 sm:px-3 sm:py-2.5 rounded-xl transition cursor-pointer">
                                         🛒 Ajouter au panier
                                     </button>
-                                    <a href="https://wa.me/{{ profil.whatsapp_clean }}?text=Bonjour,%20je%20souhaite%20réserver%20le%20produit%20:%20{{ produit.nom|urlencode }}%20au%20prix%20de%20{{ produit.prix|urlencode }}%20FCFA." target="_blank" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-3 py-2.5 rounded-xl transition text-center flex items-center justify-center">
+                                    <a href="https://wa.me{{ profil.whatsapp_clean }}?text=Bonjour,%20je%20souhaite%20réserver%20le%20produit%20:%20{{ produit.nom|urlencode }}%20au%20prix%20de%20{{ produit.prix|urlencode }}%20FCFA." target="_blank" class="bg-blue-600 hover:bg-blue-500 text-white text-[11px] sm:text-xs font-semibold px-2.5 py-2 sm:px-3 sm:py-2.5 rounded-xl transition text-center flex items-center justify-center">
                                         Réserver direct ⚡
                                     </a>
                                 </div>
@@ -92,14 +94,14 @@
                     {% endfor %}
                 </div>
             {% else %}
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center text-slate-400">
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center text-slate-400 text-sm">
                     Aucun article n'est disponible pour le moment dans cette boutique. Revenez très vite !
                 </div>
             {% endif %}
         </div>
 
-        <!-- Assistant Virtuel IA (1 colonne sur 3) -->
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col h-[600px] shadow-xl sticky top-28">
+        <!-- Assistant Virtuel IA -->
+        <div id="section-assistant" class="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 flex flex-col h-[500px] sm:h-[600px] shadow-xl lg:sticky lg:top-28 scroll-mt-24">
             <div class="flex items-center gap-2 border-b border-slate-800 pb-3 mb-4">
                 <span class="text-2xl">✨</span>
                 <div>
@@ -109,16 +111,16 @@
             </div>
 
             <!-- Boîte de dialogue -->
-            <div id="chat-box" class="flex-grow overflow-y-auto space-y-3 pr-2 text-sm">
-                <div class="bg-slate-900/80 border border-slate-700 p-3 rounded-2xl text-slate-300 max-w-[85%] leading-relaxed">
+            <div id="chat-box" class="flex-grow overflow-y-auto space-y-3 pr-2 text-xs sm:text-sm">
+                <div class="bg-slate-950/60 border border-slate-700 p-3 rounded-2xl text-slate-300 max-w-[85%] leading-relaxed">
                     Bonjour ! 👋 Je suis l'assistant de <strong>{{ profil.nom }}</strong>. Quel produit recherchez-vous aujourd'hui ?
                 </div>
             </div>
 
             <!-- Formulaire de saisie -->
             <form id="chat-form" onsubmit="envoyerMessageIA(event)" class="mt-4 flex gap-2 pt-3 border-t border-slate-800">
-                <input type="text" id="chat-input" placeholder="Écrivez votre message..." autocomplete="off" class="flex-grow bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
-                <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 rounded-xl transition font-medium text-sm">
+                <input type="text" id="chat-input" placeholder="Écrivez votre message..." autocomplete="off" class="flex-grow bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-blue-500">
+                <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 rounded-xl transition font-medium text-xs sm:text-sm cursor-pointer">
                     Envoyer
                 </button>
             </form>
@@ -131,7 +133,7 @@
         <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 space-y-5 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
                 <h3 class="font-bold text-lg text-white">🛒 Votre Panier</h3>
-                <button onclick="fermerPanier()" class="text-slate-400 hover:text-white text-xl font-bold">&times;</button>
+                <button onclick="fermerPanier()" class="text-slate-400 hover:text-white text-xl font-bold cursor-pointer">&times;</button>
             </div>
 
             <div id="panier-liste" class="space-y-3 max-h-64 overflow-y-auto text-sm">
@@ -141,15 +143,14 @@
             <div class="border-t border-slate-800 pt-4 space-y-3">
                 <div class="flex justify-between items-center text-sm font-bold">
                     <span class="text-slate-400">Total estimé :</span>
-                    <span id="panier-total" class="text-emerald-400 text-lg">0 FCFA</span>
+                    <span id="panier-total" class="text-emerald-400 text-base">0 FCFA</span>
                 </div>
-
-                <div class="grid grid-cols-2 gap-2 pt-1">
-                    <button type="button" onclick="viderPanier()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold py-3 rounded-xl transition">
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="viderPanier()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-2.5 px-4 rounded-xl text-xs transition cursor-pointer">
                         🗑 Vider le panier
                     </button>
-                    <button type="button" onclick="commanderPanierWhatsApp()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold py-3 rounded-xl transition">
-                        📲 Commander sur WhatsApp
+                    <button onclick="commanderPanierWhatsApp()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 px-4 rounded-xl text-xs transition shadow-lg shadow-emerald-900/20 cursor-pointer">
+                        📲 Commander
                     </button>
                 </div>
             </div>
@@ -157,11 +158,11 @@
     </div>
 
     <!-- Pied de page -->
-    <footer class="bg-slate-900 border-t border-slate-800 py-6 text-center text-xs text-slate-500 mt-auto">
-        Propulsé par la plateforme e-commerce multi-tenant SaaS &bull; Tous droits réservés
+    <footer class="bg-slate-900 border-t border-slate-800 text-center py-4 text-xs text-slate-500 mt-auto">
+        Propulsé par la plateforme e-commerce multi-tenant SaaS • Tous droits réservés
     </footer>
 
-    <!-- Script JavaScript pour le Panier & l'Assistant IA -->
+    <!-- Scripts JavaScript -->
     <script>
         const CLE_PANIER = "panier_{{ profil.slug }}";
         let panier = JSON.parse(localStorage.getItem(CLE_PANIER) || "[]");
@@ -206,7 +207,7 @@
             compteur.textContent = nbArticles;
             
             if (panier.length === 0) {
-                liste.innerHTML = '<p class="text-slate-500 text-center py-6">Votre panier est vide pour le moment.</p>';
+                liste.innerHTML = `<p class="text-slate-500 text-center py-6">Votre panier est vide pour le moment.</p>`;
                 totalEl.textContent = "0 FCFA";
                 return;
             }
@@ -215,13 +216,16 @@
             liste.innerHTML = panier.map(item => {
                 const prixUnitaire = extraireNombre(item.prix);
                 total += prixUnitaire * item.quantite;
-                return `<div class="flex items-center justify-between bg-slate-950 border border-slate-800 p-3 rounded-2xl">
-                    <div>
-                        <p class="font-bold text-white text-xs">${item.nom}</p>
-                        <p class="text-xs text-slate-400 mt-0.5">${item.quantite} x ${item.prix} FCFA</p>
-                    </div>
-                    <button onclick="retirerDuPanier('${item.id}')" class="text-red-400 hover:text-red-300 text-xs font-bold px-2 py-1">Retirer</button>
-                </div>`;
+                return `
+                    <div class="flex items-center justify-between bg-slate-950 border border-slate-800 p-3 rounded-2xl">
+                        <div>
+                            <p class="font-bold text-white text-xs">${item.nom}</p>
+                            <p class="text-xs text-slate-400 mt-0.5">${item.quantite} x ${item.prix} FCFA</p>
+                        </div>
+                        <button onclick="retirerDuPanier('${item.id}')" class="text-red-400 hover:text-red-300 text-xs font-bold px-2 py-1 cursor-pointer">
+                            Retirer
+                        </button>
+                    </div>`;
             }).join('');
             
             totalEl.textContent = total.toLocaleString('fr-FR') + " FCFA";
@@ -241,9 +245,9 @@
                 alert("Votre panier est vide !");
                 return;
             }
-            const lignes = panier.map(item => `- ${item.quantite}x ${item.nom} (${item.prix} FCFA)`);
+            const lignes = panier.map(item => `• ${item.quantite}x ${item.nom} (${item.prix} FCFA)`).join('\n');
             const total = document.getElementById('panier-total').textContent;
-            const message = `Bonjour *{{ profil.nom|escapejs }}* ! 👋\nJe souhaite commander les articles suivants :\n\n${lignes.join('\n')}\n\n💰 *Total estimé :* ${total}`;
+            const message = `Bonjour *{{ profil.nom|escapejs }}* ! 👋\nJe souhaite commander les articles suivants :\n\n${lignes}\n\n💰 *Total estimé :* ${total}`;
             const tel = "{{ profil.whatsapp_clean }}";
             window.open(`https://wa.me/${tel}?text=${encodeURIComponent(message)}`, '_blank');
         }
@@ -255,21 +259,20 @@
             setTimeout(() => toast.classList.add('hidden'), 2500);
         }
 
-        // Initialiser le compteur au chargement de la page
         majInterfacePanier();
 
-        // Assistant IA
         async function envoyerMessageIA(e) {
             e.preventDefault();
             const input = document.getElementById('chat-input');
             const chatBox = document.getElementById('chat-box');
             const message = input.value.trim();
+            
             if (!message) return;
-
+            
             chatBox.innerHTML += `<div class="bg-blue-600/20 border border-blue-500/30 text-blue-100 p-3 rounded-2xl max-w-[85%] ml-auto leading-relaxed">${message}</div>`;
             input.value = '';
             chatBox.scrollTop = chatBox.scrollHeight;
-
+            
             try {
                 const response = await fetch("{% url 'assistant_ia' %}", {
                     method: 'POST',
@@ -283,7 +286,7 @@
                     })
                 });
                 const data = await response.json();
-                chatBox.innerHTML += `<div class="bg-slate-900/80 border border-slate-700 p-3 rounded-2xl text-slate-300 max-w-[85%] leading-relaxed">${data.reponse}</div>`;
+                chatBox.innerHTML += `<div class="bg-slate-950/60 border border-slate-700 p-3 rounded-2xl text-slate-300 max-w-[85%] leading-relaxed">${data.reponse}</div>`;
             } catch (err) {
                 chatBox.innerHTML += `<div class="bg-red-500/10 border border-red-500/20 text-red-300 p-3 rounded-2xl max-w-[85%]">Désolé, une erreur est survenue.</div>`;
             }
