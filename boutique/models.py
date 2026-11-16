@@ -27,10 +27,13 @@ class ProfilBoutique(models.Model):
     date_creation = models.DateTimeField(auto_now_add=True)
 
     def whatsapp_clean(self):
-        """Retourne uniquement les chiffres du numéro WhatsApp pour wa.me"""
+        """Retourne uniquement les chiffres avec l'indicatif pays pour wa.me"""
         if not self.whatsapp:
             return ""
-        return re.sub(r'\D', '', self.whatsapp)
+        chiffres = re.sub(r'\D', '', self.whatsapp)
+        if len(chiffres) == 9 and chiffres.startswith('6'):
+            return f"237{chiffres}"
+        return chiffres
 
     def save(self, *args, **kwargs):
         if not self.slug:

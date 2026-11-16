@@ -11,15 +11,15 @@
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col">
 
-    <!-- En-tête de la Boutique -->
-    <header class="bg-slate-900/95 backdrop-blur-md border-b border-slate-800 px-4 py-4 sm:p-6 shadow-md sticky top-0 z-30">
-        <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-3 sm:gap-4">
+    <!-- En-tête de la Boutique (Fixé en haut de l'écran) -->
+    <header class="bg-slate-900/95 backdrop-blur-md border-b border-slate-800 px-4 py-3 sm:p-6 shadow-md fixed top-0 left-0 right-0 z-40">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-2 sm:gap-4">
             <div class="text-center md:text-left w-full md:w-auto">
-                <a href="{% url 'annuaire_boutiques' %}" class="inline-flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300 font-medium mb-1 transition">
+                <a href="{% url 'annuaire_boutiques' %}" class="inline-flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300 font-medium mb-0.5 transition">
                     ← Découvrir d'autres boutiques
                 </a>
-                <h1 class="text-xl sm:text-3xl font-bold tracking-tight text-white">{{ profil.nom }}</h1>
-                <p class="text-xs sm:text-sm text-slate-400 mt-0.5">Vitrine vérifiée • Paiement & Livraison sécurisés</p>
+                <h1 class="text-lg sm:text-3xl font-bold tracking-tight text-white">{{ profil.nom }}</h1>
+                <p class="text-[11px] sm:text-sm text-slate-400">Vitrine vérifiée • Paiement & Livraison sécurisés</p>
             </div>
             <div class="flex items-center justify-center gap-2 sm:gap-3 w-full md:w-auto">
                 <!-- Bouton Panier -->
@@ -29,7 +29,7 @@
                 </button>
 
                 {% if profil.whatsapp_clean %}
-                <a href="https://wa.me{{ profil.whatsapp_clean }}" target="_blank" class="flex-1 md:flex-initial justify-center bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-xs sm:text-sm transition flex items-center gap-2 shadow-lg shadow-emerald-900/20">
+                <a href="https://wa.me/{{ profil.whatsapp_clean }}" target="_blank" class="flex-1 md:flex-initial justify-center bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-xs sm:text-sm transition flex items-center gap-2 shadow-lg shadow-emerald-900/20">
                     💬 WhatsApp Vendeur
                 </a>
                 {% endif %}
@@ -42,91 +42,104 @@
         ✅ Article ajouté au panier !
     </div>
 
-    <!-- Bouton flottant mobile pour accéder directement à l'Assistant IA -->
-    <a href="#section-assistant" class="lg:hidden fixed bottom-5 right-5 z-40 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-4 py-3.5 rounded-full shadow-2xl shadow-blue-950 flex items-center gap-2 border border-blue-400/30">
-        <span>✨</span>
-        <span>Aide IA</span>
-    </a>
+    <!-- Bouton flottant pour ouvrir/fermer l'Assistant IA -->
+    <button onclick="toggleChatIA()" class="fixed bottom-5 right-5 z-50 bg-blue-600 hover:bg-blue-500 text-white font-bold p-3.5 sm:px-5 sm:py-3.5 rounded-full shadow-2xl shadow-blue-950 flex items-center gap-2.5 border border-blue-400/30 transition-transform hover:scale-105 cursor-pointer">
+        <span class="text-xl">✨</span>
+        <span class="hidden sm:inline text-xs font-semibold">Assistant IA</span>
+    </button>
 
-    <!-- Corps de la page / Catalogue et Chatbot -->
-    <main class="max-w-6xl mx-auto px-3 py-5 sm:p-6 flex-grow w-full grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
+    <!-- Fenêtre Flottante du Chat IA (Popup) -->
+    <div id="modal-chat-ia" class="hidden fixed bottom-20 right-4 sm:right-6 z-50 w-[92%] sm:w-[380px] h-[480px] bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl flex flex-col overflow-hidden transition-all duration-300">
+        <!-- En-tête du Chat -->
+        <div class="flex items-center justify-between bg-slate-950 px-4 py-3 border-b border-slate-800">
+            <div class="flex items-center gap-2.5">
+                <span class="text-xl">✨</span>
+                <div>
+                    <h3 class="font-bold text-white text-xs sm:text-sm">Assistant Virtuel</h3>
+                    <p class="text-[10px] text-emerald-400 font-medium">● En ligne - Posez vos questions</p>
+                </div>
+            </div>
+            <button onclick="toggleChatIA()" class="text-slate-400 hover:text-white text-lg font-bold px-2 cursor-pointer">&times;</button>
+        </div>
+
+        <!-- Boîte de dialogue -->
+        <div id="chat-box" class="flex-grow overflow-y-auto p-4 space-y-3 text-xs sm:text-sm">
+            <div class="bg-slate-950/60 border border-slate-700/80 p-3 rounded-2xl text-slate-300 max-w-[85%] leading-relaxed">
+                Bonjour ! 👋 Je suis l'assistant de <strong>{{ profil.nom }}</strong>. Quel produit recherchez-vous aujourd'hui ?
+            </div>
+        </div>
+
+        <!-- Formulaire de saisie -->
+        <form id="chat-form" onsubmit="envoyerMessageIA(event)" class="p-3 bg-slate-950 border-t border-slate-800 flex gap-2">
+            <input type="text" id="chat-input" placeholder="Écrivez votre message..." autocomplete="off" class="flex-grow bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2 text-xs sm:text-sm text-white focus:outline-none focus:border-blue-500">
+            <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white px-3.5 py-2 rounded-xl transition font-medium text-xs sm:text-sm cursor-pointer">
+                Envoyer
+            </button>
+        </form>
+    </div>
+
+    <!-- Corps de la page / Catalogue -->
+    <main class="max-w-6xl mx-auto px-3 py-6 sm:p-8 flex-grow w-full space-y-6 pt-44 sm:pt-36">
         
-        <!-- Liste des Produits -->
-        <div class="lg:col-span-2 space-y-4 sm:space-y-6">
-            <h2 class="text-base sm:text-xl font-semibold text-slate-200 border-b border-slate-800 pb-3">
-                📦 Articles Disponibles ({{ produits.count }})
-            </h2>
+        <h2 class="text-base sm:text-xl font-semibold text-slate-200 border-b border-slate-800 pb-3">
+            📦 Articles Disponibles ({{ produits.count }})
+        </h2>
 
-            {% if produits %}
-                <div class="grid grid-cols-2 gap-3 sm:gap-6">
-                    {% for produit in produits %}
-                    <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-lg flex flex-col">
-                        {% if produit.image_base64 %}
-                        <div class="h-36 sm:h-48 w-full overflow-hidden bg-slate-800">
-                            <img src="{{ produit.image_base64 }}" alt="{{ produit.nom }}" class="w-full h-full object-cover">
+        {% if produits %}
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
+                {% for produit in produits %}
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-lg flex flex-col">
+                    {% if produit.image_base64 %}
+                    <div class="h-36 sm:h-48 w-full overflow-hidden bg-slate-800">
+                        <img src="{{ produit.image_base64 }}" alt="{{ produit.nom }}" class="w-full h-full object-cover">
+                    </div>
+                    {% endif %}
+                    
+                    <div class="p-3 sm:p-4 flex flex-col flex-grow">
+                        <span class="text-[10px] sm:text-xs uppercase tracking-wider text-blue-400 font-semibold mb-1 truncate">{{ produit.get_categorie_display|default:produit.categorie }}</span>
+                        <h3 class="text-sm sm:text-base font-bold text-white mb-2 line-clamp-2">{{ produit.nom }}</h3>
+                        
+                        <!-- Bouton pour afficher/masquer les caractéristiques -->
+                        {% if produit.caracteristiques %}
+                        <div class="mb-3">
+                            <button type="button" onclick="toggleCaracteristiques('{{ produit.id }}')" class="inline-flex items-center gap-1.5 text-[11px] font-semibold text-blue-400 hover:text-blue-300 bg-blue-950/40 border border-blue-900/50 px-2.5 py-1.5 rounded-xl transition cursor-pointer w-full justify-between">
+                                <span>📄 Fiche technique</span>
+                                <span id="arrow-{{ produit.id }}" class="transform transition-transform duration-200">▼</span>
+                            </button>
+                            
+                            <!-- Contenu des caractéristiques (Caché par défaut) -->
+                            <div id="carac-{{ produit.id }}" class="hidden mt-2 bg-slate-950/70 border border-slate-800 p-2.5 rounded-xl text-xs text-slate-300 leading-relaxed">
+                                {{ produit.caracteristiques }}
+                            </div>
                         </div>
                         {% endif %}
-                        <div class="p-3 sm:p-5 flex flex-col flex-grow">
-                            <span class="text-[10px] sm:text-xs uppercase tracking-wider text-blue-400 font-semibold mb-1 truncate">{{ produit.get_categorie_display|default:produit.categorie }}</span>
-                            <h3 class="text-sm sm:text-lg font-bold text-white mb-1.5 sm:mb-2 line-clamp-2">{{ produit.nom }}</h3>
-                            <p class="text-slate-400 text-xs sm:text-sm mb-3 sm:mb-4 flex-grow line-clamp-2 sm:line-clamp-3">{{ produit.caracteristiques|default:"Aucune description spécifique." }}</p>
-                            
-                            <div class="mt-auto pt-3 sm:pt-4 border-t border-slate-800 space-y-2.5 sm:space-y-3">
-                                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
-                                    <div>
-                                        <span class="hidden sm:block text-xs text-slate-500">Prix de vente</span>
-                                        <span class="text-sm sm:text-lg font-extrabold text-emerald-400">{{ produit.prix }} FCFA</span>
-                                    </div>
-                                    <span class="self-start sm:self-auto text-[10px] sm:text-xs text-slate-400 bg-slate-800 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg">
-                                        Stock : {{ produit.stock }}
-                                    </span>
-                                </div>
+                        
+                        <div class="mt-auto pt-3 border-t border-slate-800 space-y-2.5">
+                            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
+                                <span class="text-xs sm:text-base font-extrabold text-emerald-400">{{ produit.prix }} FCFA</span>
+                                <span class="text-[10px] text-slate-400 bg-slate-800 px-2 py-0.5 rounded-lg w-fit">
+                                    Stock : {{ produit.stock }}
+                                </span>
+                            </div>
 
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 sm:gap-2">
-                                    <button type="button" onclick="ajouterAuPanier('{{ produit.id }}', '{{ produit.nom|escapejs }}', '{{ produit.prix|escapejs }}')" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white text-[11px] sm:text-xs font-semibold px-2.5 py-2 sm:px-3 sm:py-2.5 rounded-xl transition cursor-pointer">
-                                        🛒 Ajouter au panier
-                                    </button>
-                                    <a href="https://wa.me{{ profil.whatsapp_clean }}?text=Bonjour,%20je%20souhaite%20réserver%20le%20produit%20:%20{{ produit.nom|urlencode }}%20au%20prix%20de%20{{ produit.prix|urlencode }}%20FCFA." target="_blank" class="bg-blue-600 hover:bg-blue-500 text-white text-[11px] sm:text-xs font-semibold px-2.5 py-2 sm:px-3 sm:py-2.5 rounded-xl transition text-center flex items-center justify-center">
-                                        Réserver direct ⚡
-                                    </a>
-                                </div>
+                            <div class="grid grid-cols-1 gap-1.5">
+                                <button type="button" onclick="ajouterAuPanier('{{ produit.id }}', '{{ produit.nom|escapejs }}', '{{ produit.prix|escapejs }}')" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white text-[11px] font-semibold px-2 py-2 rounded-xl transition cursor-pointer">
+                                    🛒 Ajouter au panier
+                                </button>
+                                <a href="https://wa.me/{{ profil.whatsapp_clean }}?text=Bonjour,%20je%20souhaite%20réserver%20le%20produit%20:%20{{ produit.nom|urlencode }}%20au%20prix%20de%20{{ produit.prix|urlencode }}%20FCFA." target="_blank" class="bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-semibold px-2 py-2 rounded-xl transition text-center flex items-center justify-center">
+                                    Réserver direct ⚡
+                                </a>
                             </div>
                         </div>
                     </div>
-                    {% endfor %}
                 </div>
-            {% else %}
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center text-slate-400 text-sm">
-                    Aucun article n'est disponible pour le moment dans cette boutique. Revenez très vite !
-                </div>
-            {% endif %}
-        </div>
-
-        <!-- Assistant Virtuel IA -->
-        <div id="section-assistant" class="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 flex flex-col h-[500px] sm:h-[600px] shadow-xl lg:sticky lg:top-28 scroll-mt-24">
-            <div class="flex items-center gap-2 border-b border-slate-800 pb-3 mb-4">
-                <span class="text-2xl">✨</span>
-                <div>
-                    <h3 class="font-bold text-white text-sm">Assistant Virtuel IA</h3>
-                    <p class="text-xs text-slate-400">Posez vos questions sur les articles</p>
-                </div>
+                {% endfor %}
             </div>
-
-            <!-- Boîte de dialogue -->
-            <div id="chat-box" class="flex-grow overflow-y-auto space-y-3 pr-2 text-xs sm:text-sm">
-                <div class="bg-slate-950/60 border border-slate-700 p-3 rounded-2xl text-slate-300 max-w-[85%] leading-relaxed">
-                    Bonjour ! 👋 Je suis l'assistant de <strong>{{ profil.nom }}</strong>. Quel produit recherchez-vous aujourd'hui ?
-                </div>
+        {% else %}
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center text-slate-400 text-sm">
+                Aucun article n'est disponible pour le moment dans cette boutique. Revenez très vite !
             </div>
-
-            <!-- Formulaire de saisie -->
-            <form id="chat-form" onsubmit="envoyerMessageIA(event)" class="mt-4 flex gap-2 pt-3 border-t border-slate-800">
-                <input type="text" id="chat-input" placeholder="Écrivez votre message..." autocomplete="off" class="flex-grow bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-blue-500">
-                <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 rounded-xl transition font-medium text-xs sm:text-sm cursor-pointer">
-                    Envoyer
-                </button>
-            </form>
-        </div>
+        {% endif %}
 
     </main>
 
@@ -168,6 +181,24 @@
     <script>
         const CLE_PANIER = "panier_{{ profil.slug }}";
         let panier = JSON.parse(localStorage.getItem(CLE_PANIER) || "[]");
+
+        function toggleChatIA() {
+            const modalChat = document.getElementById('modal-chat-ia');
+            modalChat.classList.toggle('hidden');
+        }
+
+        // Fonction pour afficher/masquer les caractéristiques d'un produit
+        function toggleCaracteristiques(produitId) {
+            const caracDiv = document.getElementById(`carac-${produitId}`);
+            const arrow = document.getElementById(`arrow-${produitId}`);
+            
+            if (caracDiv) {
+                caracDiv.classList.toggle('hidden');
+                if (arrow) {
+                    arrow.style.transform = caracDiv.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
+                }
+            }
+        }
 
         function extraireNombre(prixTexte) {
             const chiffres = String(prixTexte).replace(/\D/g, '');
