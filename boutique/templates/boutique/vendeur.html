@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Espace Vendeur — {{ profil.nom }}</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
@@ -52,18 +52,31 @@
                 <form method="POST" class="space-y-4">
                     {% csrf_token %}
                     <input type="hidden" name="action" value="maj_profil">
+                    
                     <div>
                         <label class="block text-[11px] font-extrabold uppercase tracking-wider text-slate-500 mb-1.5">Nom de la boutique</label>
                         <input type="text" name="nom" value="{{ profil.nom }}" required class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-xs focus:outline-none focus:border-blue-600 focus:bg-white transition-all">
                     </div>
+
+                    <div>
+                        <label class="block text-[11px] font-extrabold uppercase tracking-wider text-slate-500 mb-1.5">Secteur d'activité</label>
+                        <select name="secteur" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-xs focus:outline-none focus:border-blue-600 focus:bg-white transition-all cursor-pointer">
+                            {% for code, label in secteurs %}
+                                <option value="{{ code }}" {% if profil.secteur == code %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
                     <div>
                         <label class="block text-[11px] font-extrabold uppercase tracking-wider text-slate-500 mb-1.5">Numéro WhatsApp (avec indicatif pays)</label>
                         <input type="text" name="whatsapp" value="{{ profil.whatsapp }}" required class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-xs focus:outline-none focus:border-blue-600 focus:bg-white transition-all">
                     </div>
+
                     <div>
                         <label class="block text-[11px] font-extrabold uppercase tracking-wider text-slate-500 mb-1.5">Conditions de livraison & horaires</label>
                         <textarea name="infos_livraison" rows="3" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-xs focus:outline-none focus:border-blue-600 focus:bg-white transition-all">{{ profil.infos_livraison }}</textarea>
                     </div>
+
                     <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs py-3.5 rounded-2xl transition-all shadow-sm cursor-pointer">
                         Enregistrer les modifications
                     </button>
@@ -82,18 +95,21 @@
                     <input type="hidden" name="action" value="ajouter_produit">
                     
                     <div>
-                        <label class="block text-[11px] font-extrabold uppercase tracking-wider text-slate-500 mb-1.5">Nom du modèle *</label>
-                        <input type="text" name="nom" placeholder="Ex: iPhone 13 Pro ou HP EliteBook" required class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-xs focus:outline-none focus:border-blue-600 focus:bg-white transition-all">
+                        <label class="block text-[11px] font-extrabold uppercase tracking-wider text-slate-500 mb-1.5">Nom du produit ou service *</label>
+                        <input type="text" name="nom" placeholder="Ex: iPhone 13 Pro, Robe d'été, Sérum Vitamine C..." required class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-xs focus:outline-none focus:border-blue-600 focus:bg-white transition-all">
                     </div>
                     
-                    <div class="grid grid-cols-2 gap-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
                             <label class="block text-[11px] font-extrabold uppercase tracking-wider text-slate-500 mb-1.5">Catégorie</label>
                             <select name="categorie" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-xs focus:outline-none focus:border-blue-600 focus:bg-white transition-all cursor-pointer">
-                                <option value="SMARTPHONE">Téléphones & Tablettes</option>
-                                <option value="PC">Ordinateurs & Laptops</option>
-                                <option value="ACCESSOIRE">Accessoires & Chargeurs</option>
-                                <option value="RESEAU">Routeurs & Réseau</option>
+                                {% for groupe, sous_categories in categories %}
+                                    <optgroup label="{{ groupe }}">
+                                        {% for code, nom_cat in sous_categories %}
+                                            <option value="{{ code }}">{{ nom_cat }}</option>
+                                        {% endfor %}
+                                    </optgroup>
+                                {% endfor %}
                             </select>
                         </div>
                         <div>
@@ -104,12 +120,12 @@
 
                     <div>
                         <label class="block text-[11px] font-extrabold uppercase tracking-wider text-slate-500 mb-1.5">Prix de vente *</label>
-                        <input type="text" name="prix" placeholder="Ex: 220 000 FCFA" required class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-xs focus:outline-none focus:border-blue-600 focus:bg-white transition-all">
+                        <input type="text" name="prix" placeholder="Ex: 25 000 FCFA" required class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-xs focus:outline-none focus:border-blue-600 focus:bg-white transition-all">
                     </div>
 
                     <div>
                         <label class="block text-[11px] font-extrabold uppercase tracking-wider text-slate-500 mb-1.5">Fiche technique & Description *</label>
-                        <textarea name="caracteristiques" rows="4" placeholder="Ex: 128Go, batterie 88%, garanti 3 mois avec chargeur d'origine." required class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-xs focus:outline-none focus:border-blue-600 focus:bg-white transition-all"></textarea>
+                        <textarea name="caracteristiques" rows="4" placeholder="Ex: Taille M/L, couleur noire, livraison disponible..." required class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-xs focus:outline-none focus:border-blue-600 focus:bg-white transition-all"></textarea>
                     </div>
 
                     <div>
@@ -124,83 +140,113 @@
             </section>
         </div>
 
-        <!-- COLONNE DROITE : RÉSERVATIONS CLIENTS + STOCK EN RAYON -->
+        <!-- COLONNE DROITE : RÉSERVATIONS & CATALOGUE -->
         <div class="lg:col-span-7 space-y-6">
             
-            <!-- Réservations reçues -->
+            <!-- Section 1 : Réservations Clients -->
             <section class="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
                 <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                    <h2 class="font-extrabold text-sm sm:text-base text-slate-900">📋 Réservations Clients ({{ reservations.count }})</h2>
+                    <div class="flex items-center gap-3">
+                        <span class="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-sm">📋</span>
+                        <h2 class="font-extrabold text-sm sm:text-base text-slate-900">Réservations Clients</h2>
+                    </div>
+                    <span class="bg-amber-100 text-amber-800 text-[11px] font-extrabold px-2.5 py-1 rounded-full">{{ reservations.count }}</span>
                 </div>
+
                 {% if reservations %}
-                <div class="space-y-3">
-                    {% for r in reservations %}
-                    <div class="p-4 rounded-2xl border {% if r.traitee %}bg-slate-50 border-slate-200 opacity-60{% else %}bg-emerald-50/50 border-emerald-200{% endif %} flex items-center justify-between gap-3">
-                        <div class="text-xs">
-                            <p class="font-extrabold text-slate-900">#{{ r.id }} • {{ r.produit.nom }} <span class="text-blue-600">({{ r.produit.prix }})</span></p>
-                            <p class="text-slate-500 text-[11px] mt-0.5">Commandé le {{ r.date_reservation|date:"d/m/Y à H:i" }}</p>
-                        </div>
-                        <form method="POST">
-                            {% csrf_token %}
-                            <input type="hidden" name="action" value="marquer_traitee">
-                            <input type="hidden" name="reservation_id" value="{{ r.id }}">
-                            <button type="submit" class="text-[11px] font-extrabold px-3 py-1.5 rounded-xl border transition cursor-pointer {% if r.traitee %}bg-white border-slate-300 text-slate-600{% else %}bg-emerald-600 text-white border-emerald-600{% endif %}">
-                                {% if r.traitee %}Traité ✅{% else %}Marquer traité ⏳{% endif %}
-                            </button>
-                        </form>
+                    <div class="space-y-3 max-h-[400px] overflow-y-auto pr-1">
+                        {% for r in reservations %}
+                            <div class="bg-slate-50 border border-slate-200/70 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                <div class="space-y-1">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xs font-black text-slate-900">#{{ r.id }}</span>
+                                        <span class="text-xs font-bold text-blue-600">{{ r.produit.nom }}</span>
+                                        <span class="text-[11px] font-semibold text-slate-500">({{ r.produit.prix }})</span>
+                                    </div>
+                                    <p class="text-[11px] text-slate-400 font-medium">Commandé le {{ r.date_reservation|date:"d/m/Y à H:i" }}</p>
+                                </div>
+                                <form method="POST">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="marquer_traitee">
+                                    <input type="hidden" name="reservation_id" value="{{ r.id }}">
+                                    <button type="submit" class="w-full sm:w-auto text-[11px] font-extrabold px-3.5 py-2 rounded-xl transition-all cursor-pointer {% if r.traitee %}bg-emerald-100 text-emerald-800 hover:bg-emerald-200{% else %}bg-slate-900 text-white hover:bg-slate-800{% endif %}">
+                                        {% if r.traitee %}Traité ✅{% else %}Marquer traité ⏳{% endif %}
+                                    </button>
+                                </form>
+                            </div>
+                        {% endfor %}
                     </div>
-                    {% endfor %}
-                </div>
                 {% else %}
-                <p class="text-xs text-slate-400 text-center py-4">Aucune réservation pour le moment.</p>
+                    <div class="text-center py-8 text-slate-400 text-xs font-medium">
+                        Aucune réservation pour le moment.
+                    </div>
                 {% endif %}
             </section>
 
-            <!-- Produits en stock -->
+            <!-- Section 2 : Catalogue & Stock -->
             <section class="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
                 <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                    <h2 class="font-extrabold text-sm sm:text-base text-slate-900">📦 Catalogue & Stock ({{ produits.count }})</h2>
-                </div>
-                {% if produits %}
-                <div class="space-y-3">
-                    {% for p in produits %}
-                    <div class="p-4 rounded-2xl border border-slate-200 flex items-center justify-between gap-4">
-                        <div class="flex items-center gap-3">
-                            {% if p.image_base64 %}
-                            <img src="{{ p.image_base64 }}" alt="{{ p.nom }}" class="w-12 h-12 rounded-xl object-cover border border-slate-100">
-                            {% else %}
-                            <div class="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-lg">📱</div>
-                            {% endif %}
-                            <div class="text-xs">
-                                <p class="font-extrabold text-slate-900">{{ p.nom }}</p>
-                                <p class="text-blue-600 font-bold mt-0.5">{{ p.prix }}</p>
-                                <p class="text-slate-400 text-[10px] mt-0.5">Stock : <span class="font-bold text-slate-700">{{ p.stock }}</span></p>
-                            </div>
-                        </div>
-                        
-                        <div class="flex items-center gap-2">
-                            <form method="POST" class="flex items-center gap-1">
-                                {% csrf_token %}
-                                <input type="hidden" name="action" value="maj_stock">
-                                <input type="hidden" name="produit_id" value="{{ p.id }}">
-                                <input type="number" name="nouveau_stock" value="{{ p.stock }}" min="0" class="w-14 bg-slate-50 border border-slate-200 rounded-xl px-2 py-1.5 text-xs text-center font-bold">
-                                <button type="submit" class="bg-slate-900 hover:bg-slate-800 text-white text-[10px] font-bold px-2.5 py-1.5 rounded-xl cursor-pointer">Mettre à jour</button>
-                            </form>
-
-                            <form method="POST">
-                                {% csrf_token %}
-                                <input type="hidden" name="action" value="supprimer_produit">
-                                <input type="hidden" name="produit_id" value="{{ p.id }}">
-                                <button type="submit" onclick="return confirm('Confirmer la suppression ?')" class="text-red-500 hover:bg-red-50 p-2 rounded-xl text-xs transition cursor-pointer" title="Supprimer">🗑️</button>
-                            </form>
-                        </div>
+                    <div class="flex items-center gap-3">
+                        <span class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-sm">📦</span>
+                        <h2 class="font-extrabold text-sm sm:text-base text-slate-900">Catalogue & Stock</h2>
                     </div>
-                    {% endfor %}
+                    <span class="bg-blue-100 text-blue-800 text-[11px] font-extrabold px-2.5 py-1 rounded-full">{{ produits.count }}</span>
                 </div>
+
+                {% if produits %}
+                    <div class="space-y-3 max-h-[500px] overflow-y-auto pr-1">
+                        {% for p in produits %}
+                            <div class="bg-slate-50 border border-slate-200/70 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                <div class="flex items-center gap-3.5">
+                                    <div class="w-14 h-14 rounded-2xl bg-slate-200 overflow-hidden flex-shrink-0 flex items-center justify-center border border-slate-300/50">
+                                        {% if p.image_base64 %}
+                                            <img src="{{ p.image_base64 }}" alt="{{ p.nom }}" class="w-full h-full object-cover">
+                                        {% else %}
+                                            <span class="text-xl">📦</span>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <span class="inline-block text-[10px] font-extrabold uppercase tracking-wider text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md mb-1">{{ p.get_categorie_display }}</span>
+                                        <h3 class="font-extrabold text-xs sm:text-sm text-slate-900">{{ p.nom }}</h3>
+                                        <p class="text-xs font-bold text-slate-700">{{ p.prix }}</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center gap-2.5 justify-end">
+                                    <!-- Formulaire Maj Stock -->
+                                    <form method="POST" class="flex items-center gap-1.5">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="maj_stock">
+                                        <input type="hidden" name="produit_id" value="{{ p.id }}">
+                                        <div class="flex flex-col">
+                                            <span class="text-[9px] font-extrabold text-slate-400 uppercase">Stock</span>
+                                            <input type="number" name="nouveau_stock" value="{{ p.stock }}" min="0" class="w-16 bg-white border border-slate-200 rounded-xl px-2 py-1.5 text-xs text-center font-bold focus:outline-none focus:border-blue-600">
+                                        </div>
+                                        <button type="submit" class="self-end bg-slate-900 hover:bg-slate-800 text-white text-[11px] font-extrabold px-3 py-2 rounded-xl transition-all cursor-pointer">
+                                            Mettre à jour
+                                        </button>
+                                    </form>
+
+                                    <!-- Formulaire Supprimer Produit -->
+                                    <form method="POST" onsubmit="return confirm('Voulez-vous vraiment supprimer cet article ?');">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="supprimer_produit">
+                                        <input type="hidden" name="produit_id" value="{{ p.id }}">
+                                        <button type="submit" class="self-end bg-rose-50 hover:bg-rose-100 text-rose-600 p-2 rounded-xl transition-all cursor-pointer" title="Supprimer">
+                                            🗑
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
                 {% else %}
-                <p class="text-xs text-slate-400 text-center py-6">Votre catalogue est vide. Ajoutez votre premier article ci-contre !</p>
+                    <div class="text-center py-8 text-slate-400 text-xs font-medium">
+                        Votre catalogue est vide. Ajoutez votre premier article ci-contre !
+                    </div>
                 {% endif %}
             </section>
+
         </div>
 
     </main>

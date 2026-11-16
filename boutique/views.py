@@ -31,20 +31,28 @@ def accueil(request):
     
     # Si aucune boutique marchande n'existe encore
     if not boutiques.exists():
-        return render(request, "boutique/annuaire_boutiques.html")
+        return render(request, "boutique/annuaire_boutiques.html", {
+            "secteurs": ProfilBoutique.SECTEURS
+        })
         
     # S'il n'y a qu'une seule boutique marchande -> Redirection directe vers son catalogue
     if boutiques.count() == 1:
         return redirect("catalogue", boutique_slug=boutiques.first().slug)
         
     # S'il y a plusieurs boutiques marchandes -> Annuaire
-    return render(request, "boutique/annuaire_boutiques.html", {"boutiques": boutiques})
+    return render(request, "boutique/annuaire_boutiques.html", {
+        "boutiques": boutiques,
+        "secteurs": ProfilBoutique.SECTEURS
+    })
 
 
 def annuaire_boutiques(request):
     """Affiche toujours la liste complète de toutes les boutiques marchandes."""
     boutiques = ProfilBoutique.objects.exclude(user__is_superuser=True).order_by("-id")
-    return render(request, "boutique/annuaire_boutiques.html", {"boutiques": boutiques})
+    return render(request, "boutique/annuaire_boutiques.html", {
+        "boutiques": boutiques,
+        "secteurs": ProfilBoutique.SECTEURS
+    })
 
 
 def inscription_vendeur(request):
@@ -55,6 +63,7 @@ def inscription_vendeur(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         nom_boutique = request.POST.get('nom_boutique')
+        secteur = request.POST.get('secteur', 'TELECOM')
         whatsapp = request.POST.get('whatsapp')
         
         if form.is_valid():
@@ -62,6 +71,7 @@ def inscription_vendeur(request):
             ProfilBoutique.objects.create(
                 user=user,
                 nom=nom_boutique or f"Boutique de {user.username}",
+                secteur=secteur,
                 whatsapp=whatsapp or ""
             )
             login(request, user, backend='django.contrib.auth.backends.ModelBackend')
@@ -69,7 +79,10 @@ def inscription_vendeur(request):
     else:
         form = UserCreationForm()
         
-    return render(request, 'boutique/inscription.html', {'form': form})
+    return render(request, 'boutique/inscription.html', {
+        'form': form,
+        'secteurs': ProfilBoutique.SECTEURS
+    })
 
 
 def connexion_vendeur(request):
@@ -110,6 +123,7 @@ def tableau_bord_vendeur(request):
 
         if action == "maj_profil":
             profil.nom = request.POST.get("nom", profil.nom)
+            profil.secteur = request.POST.get("secteur", profil.secteur)
             profil.whatsapp = request.POST.get("whatsapp", profil.whatsapp)
             profil.infos_livraison = request.POST.get("infos_livraison", profil.infos_livraison)
             profil.save()
@@ -123,7 +137,7 @@ def tableau_bord_vendeur(request):
             Produit.objects.create(
                 boutique=profil,
                 nom=request.POST.get("nom"),
-                categorie=request.POST.get("categorie", "SMARTPHONE"),
+                categorie=request.POST.get("categorie", "SMART_PHONE"),
                 prix=request.POST.get("prix"),
                 stock=int(request.POST.get("stock", 1)),
                 caracteristiques=request.POST.get("caracteristiques", ""),
@@ -154,7 +168,9 @@ def tableau_bord_vendeur(request):
     return render(request, "boutique/vendeur.html", {
         "profil": profil,
         "produits": produits,
-        "reservations": reservations
+        "reservations": reservations,
+        "secteurs": ProfilBoutique.SECTEURS,
+        "categories": Produit.CATEGORIES
     })
 
 
@@ -223,6 +239,7 @@ def assistant_ia_vue(request):
 
     profil = ProfilBoutique.objects.filter(slug=boutique_slug).first() or ProfilBoutique.objects.first()
     nom_boutique = profil.nom if profil else "notre boutique"
+    secteur_boutique = profil.get_secteur_display() if profil else "Commerce général"
     slug_actuel = profil.slug if profil else "default"
 
     liste_produits = ""
@@ -242,8 +259,10 @@ def assistant_ia_vue(request):
     prompt_complet = "\n".join(historique)
 
     instructions_systeme = (
-        f"Tu es un conseiller de vente humain, calme et naturel de la boutique '{nom_boutique}'.\n"
+        f"Tu es un conseiller de vente humain, calme et naturel de la boutique '{nom_boutique}' "
+        f"(Secteur : {secteur_boutique}).\n"
         f"RÈGLES STRICTES :\n"
+        f"- Adapte ton vocabulaire au secteur d'activité de la boutique.\n"
         f"- Ne dis JAMAIS 'Bonjour' ou 'Bienvenue' si la conversation a déjà commencé.\n"
         f"- Fais des réponses courtes et naturelles (2 à 3 phrases maximum), comme sur WhatsApp.\n"
         f"- Propose UNIQUEMENT les articles en stock ci-dessous :\n\n"
@@ -251,7 +270,10 @@ def assistant_ia_vue(request):
     )
 
     succes, resultat = appeler_gemini(instructions_systeme, prompt_complet, API_KEY)
+    
     if succes:
         historique.append(f"Vendeur : {resultat}")
         request.session[cle_session] = historique
         return JsonResponse({"reponse": resultat})
+        
+    return JsonResponse({"reponse": "Désolé, je rencontre un petit souci de connexion. Pouvez-vous répéter ?"})
