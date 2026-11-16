@@ -24,6 +24,7 @@ class ProfilBoutique(models.Model):
     slug = models.SlugField(unique=True, blank=True)
     whatsapp = models.CharField(max_length=30, blank=True)
     infos_livraison = models.TextField(blank=True)
+    vues = models.PositiveIntegerField(default=0)
     date_creation = models.DateTimeField(auto_now_add=True)
 
     def whatsapp_clean(self):
