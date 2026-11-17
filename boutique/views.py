@@ -1,7 +1,7 @@
 import base64
 import json
 import re
-from io import BytesIO
+import io
 from PIL import Image
 from google import genai
 from google.genai import types
@@ -9,6 +9,7 @@ from django.conf import settings
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.core.paginator import Paginator
 from django.db.models import F
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -16,13 +17,13 @@ from .models import ProfilBoutique, Produit, Reservation
 
 
 def alleger_image_b64(image_file):
-    """Redimensionne et compresse l'image avant de la convertir en Base64 pour alléger la base de données."""
+    """Compresse et redimensionne automatiquement l'image en JPEG léger pour économiser la RAM."""
     try:
         img = Image.open(image_file)
         if img.mode in ("RGBA", "P"):
             img = img.convert("RGB")
         img.thumbnail((800, 800))
-        buffer = BytesIO()
+        buffer = io.BytesIO()
         img.save(buffer, format="JPEG", quality=75, optimize=True)
         encoded = base64.b64encode(buffer.getvalue()).decode('utf-8')
         return f"data:image/jpeg;base64,{encoded}"
@@ -40,20 +41,16 @@ def accueil(request):
     if request.user.is_authenticated and not request.user.is_superuser:
         return redirect("vendeur")
         
-    # On récupère uniquement les boutiques des marchands (en excluant l'admin/superuser)
     boutiques = ProfilBoutique.objects.exclude(user__is_superuser=True).order_by("-id")
     
-    # Si aucune boutique marchande n'existe encore
     if not boutiques.exists():
         return render(request, "boutique/annuaire_boutiques.html", {
             "secteurs": ProfilBoutique.SECTEURS
         })
         
-    # S'il n'y a qu'une seule boutique marchande -> Redirection directe vers son catalogue
     if boutiques.count() == 1:
         return redirect("catalogue", boutique_slug=boutiques.first().slug)
         
-    # S'il y a plusieurs boutiques marchandes -> Annuaire
     return render(request, "boutique/annuaire_boutiques.html", {
         "boutiques": boutiques,
         "secteurs": ProfilBoutique.SECTEURS
@@ -189,14 +186,21 @@ def tableau_bord_vendeur(request):
 
 
 def catalogue_boutique(request, boutique_slug):
-    """Affiche la vitrine publique d'une boutique spécifique (Multi-tenant) avec compteur de vues."""
+    """Affiche la vitrine publique d'une boutique avec compteur de vues et pagination anti-saturation RAM."""
     profil = get_object_or_404(ProfilBoutique, slug=boutique_slug)
     
-    # Incrémente le compteur de vues de +1 directement en base de données
+    # Incrémente les vues de +1 directement en base de données
     ProfilBoutique.objects.filter(pk=profil.pk).update(vues=F('vues') + 1)
     profil.refresh_from_db()
     
-    produits = profil.produits.all().order_by("-date_ajout")
+    # Récupération des produits
+    produits_list = profil.produits.all().order_by("-date_ajout")
+    
+    # Pagination : maximum 12 produits par page pour éviter le crash 502 / Out of Memory
+    paginator = Paginator(produits_list, 12)
+    page_number = request.GET.get('page')
+    produits = paginator.get_page(page_number)
+    
     return render(request, "boutique/catalogue.html", {
         "profil": profil,
         "produits": produits
@@ -237,7 +241,7 @@ def appeler_gemini(instruction, prompt_complet, api_key):
 
 
 def assistant_ia_vue(request):
-    """Endpoint AJAX pour l'assistant IA connecté au stock, avec mémoire et priorité au stock réel."""
+    """Endpoint AJAX pour l'assistant IA connecté au stock."""
     if request.method != "POST":
         return JsonResponse({"erreur": "Méthode non autorisée"}, status=405)
         
