@@ -4,14 +4,17 @@ import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# 1. Sécurisé : Récupéré via l'environnement (avec valeur de secours pour le local)
 SECRET_KEY = os.environ.get(
     "SECRET_KEY",
     "django-insecure-e#dzck&2n8s(hk2bm33nk0_^8yb4_kll^iwlt9g=p-zfc#w3@6"
 )
 
-DEBUG = os.environ.get("DEBUG", "True") == "True"
+# 2. Sécurisé : Désactivé par défaut en production (False)
+DEBUG = os.environ.get("DEBUG", "False") == "True"
 
-ALLOWED_HOSTS = ["*"]
+# 3. Sécurisé : Restreint à Render, localhost et 127.0.0.1
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", ".onrender.com,127.0.0.1,localhost").split(",")
 
 CSRF_TRUSTED_ORIGINS = [
     "https://*.onrender.com",
