@@ -2,6 +2,7 @@ import base64
 import json
 import re
 import io
+import time
 from PIL import Image
 from google import genai
 from google.genai import types
@@ -10,6 +11,7 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.core.paginator import Paginator
+from django.core.cache import cache
 from django.db.models import F
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -241,7 +243,7 @@ def appeler_gemini(instruction, prompt_complet, api_key):
 
 
 def assistant_ia_vue(request):
-    """Endpoint AJAX pour l'assistant IA connecté au stock."""
+    """Endpoint AJAX pour l'assistant IA connecté au stock, avec protections anti-spam."""
     if request.method != "POST":
         return JsonResponse({"erreur": "Méthode non autorisée"}, status=405)
         
@@ -255,6 +257,28 @@ def assistant_ia_vue(request):
 
     if not message_client:
         return JsonResponse({"reponse": "Écris-moi un petit message !"})
+
+    # --- BLOC DE LIMITATION DEMANDÉ ---
+    if len(message_client) > 500:
+        return JsonResponse({"reponse": "Ton message est un peu trop long (500 caractères maximum)."})
+
+    client_ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR'))
+    if client_ip:
+        client_ip = client_ip.split(',')[0].strip()
+    else:
+        client_ip = "unknown"
+
+    cache_key = f"rate_limit_ai_{client_ip}"
+    requetes_recentes = cache.get(cache_key, 0)
+
+    # Maximum 12 messages par minute par visiteur
+    if requetes_recentes >= 12:
+        return JsonResponse({
+            "reponse": "Oups ! Tu envoies des messages trop rapidement. Attends une petite minute."
+        }, status=429)
+
+    cache.set(cache_key, requetes_recentes + 1, timeout=60)
+    # ----------------------------------
 
     API_KEY = getattr(settings, "GEMINI_API_KEY", "").strip()
     if not API_KEY:
