@@ -1,24 +1,38 @@
 import base64
 import json
 import re
+from io import BytesIO
+from PIL import Image
 from google import genai
 from google.genai import types
 from django.conf import settings
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.db.models import F
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from .models import ProfilBoutique, Produit, Reservation
 
 
 def alleger_image_b64(image_file):
-    """Convertit un fichier image uploadé en chaîne Base64."""
+    """Redimensionne et compresse l'image avant de la convertir en Base64 pour alléger la base de données."""
     try:
-        encoded = base64.b64encode(image_file.read()).decode('utf-8')
-        return f"data:{image_file.content_type};base64,{encoded}"
+        img = Image.open(image_file)
+        if img.mode in ("RGBA", "P"):
+            img = img.convert("RGB")
+        img.thumbnail((800, 800))
+        buffer = BytesIO()
+        img.save(buffer, format="JPEG", quality=75, optimize=True)
+        encoded = base64.b64encode(buffer.getvalue()).decode('utf-8')
+        return f"data:image/jpeg;base64,{encoded}"
     except Exception:
-        return ""
+        try:
+            image_file.seek(0)
+            encoded = base64.b64encode(image_file.read()).decode('utf-8')
+            return f"data:{image_file.content_type};base64,{encoded}"
+        except Exception:
+            return ""
 
 
 def accueil(request):
@@ -175,8 +189,13 @@ def tableau_bord_vendeur(request):
 
 
 def catalogue_boutique(request, boutique_slug):
-    """Affiche la vitrine publique d'une boutique spécifique (Multi-tenant)."""
+    """Affiche la vitrine publique d'une boutique spécifique (Multi-tenant) avec compteur de vues."""
     profil = get_object_or_404(ProfilBoutique, slug=boutique_slug)
+    
+    # Incrémente le compteur de vues de +1 directement en base de données
+    ProfilBoutique.objects.filter(pk=profil.pk).update(vues=F('vues') + 1)
+    profil.refresh_from_db()
+    
     produits = profil.produits.all().order_by("-date_ajout")
     return render(request, "boutique/catalogue.html", {
         "profil": profil,
